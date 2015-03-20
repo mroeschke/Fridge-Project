@@ -9,7 +9,9 @@ import numpy as np
 import scipy.io as io
 import pylab as pl
 from pykalman import UnscentedKalmanFilter
+import matplotlib.pyplot as plt
 
+plt.style.use('ggplot')
 
 states = 4
 params = 6
@@ -56,7 +58,7 @@ data = io.loadmat('fridge_data_3_12_15.mat')
 data = data['fridge']
 
 observations = []
-for i in range(len(data)-10100,len(data)):
+for i in range(len(data)-10080,len(data)):
     observations.append( [data[i][3], data[i][1], data[i][4], data[i][6], 0, 0, 0, 0, 0, 0] )
 # Observations: T_soda, T_fridge, T_ambient, compressor State
 # 0's = unknown parameters    
@@ -136,8 +138,8 @@ for k in range(offset,n_timesteps - 2):
     T_soda_kplus.append( T_soda_kplus1 )
     T_fridge_kplus.append(T_fridge_kplus1 )
     #Error with varying parameters
-    err_soda.append( Ts[k+1] - T_soda_kplus1 )
-    err_fridge.append( Tf[k+1] - T_fridge_kplus1 )
+    err_soda.append(Ts[k+1] - T_soda_kplus1 )
+    err_fridge.append(Tf[k+1] - T_fridge_kplus1 )
     
     T_soda_kplus1_est = p0[-1]*Ts[k] + p1[-1]*Tf[k] 
     T_fridge_kplus1_est = p2[-1]*Ts[k] + p3[-1]*Tf[k] + p4[-1]*To[k] + p5[-1]*d[k]
@@ -148,36 +150,121 @@ for k in range(offset,n_timesteps - 2):
 soda_rmse = np.sqrt( np.mean( np.square( np.array(err_soda) ) ) )
 print "Soda RMSE: ",soda_rmse
 fridge_rmse = np.sqrt( np.mean( np.square( np.array(err_fridge) ) ) )
-print "Fridge RMSE: ",fridge_rmse    
+print "Fridge RMSE: ",fridge_rmse
+"""    
+################################################################################################
+#Week Subsection
+###############
 
 #Plot Fridge Temp
-pl.figure()
+pl.subplot(2,1,1)
 lines_ukf = []
 lines_ukf.append( pl.plot(Tf, color='r', ls='-') )
-lines_ukf.append( pl.plot(Tf_est, color='b', ls='-') )
+lines_ukf.append( pl.plot(Tf_est, color='b', ls='--') )
 #lines_ukf.append( pl.plot(T_fridge_kplus, color='g', ls='-') )
 #lines_ukf.append( pl.plot(T_fridge_kplus_est, color='k', ls='-') )
 #pl.legend((lines_ukf[0][0], lines_ukf[1][0], lines_ukf[2][0],  lines_ukf[3][0]),
           #('T measured', 'T filtered', 'T sim variable $\Theta$', 'T sim constant $\Theta$'),
           #loc='upper right'
 #)
-pl.legend((lines_ukf[0][0], lines_ukf[1][0]),('T measured', 'T filtered'),loc='upper right')
-pl.title('Fridge Temperature')
-pl.ylim([260, 300])
+pl.legend((lines_ukf[0][0], lines_ukf[1][0]),('T_{Fridge} Measured', 'T_{Fridge} filtered'),loc='lower left')
+pl.title('Temperature States')
+pl.ylim([270, 290])
+
+
 #Plot Soda Temp
-pl.figure()
+pl.subplot(2,1,2)
 lines_ukf = []
 lines_ukf.append( pl.plot(Ts, color='r', ls='-') )
-lines_ukf.append( pl.plot(Ts_est, color='b', ls='-') )
+lines_ukf.append( pl.plot(Ts_est, color='b', ls='--') )
 #lines_ukf.append( pl.plot(T_soda_kplus, color='g', ls='-') )
 #lines_ukf.append( pl.plot(T_soda_kplus_est, color='k', ls='-') )
 #pl.legend((lines_ukf[0][0], lines_ukf[1][0], lines_ukf[2][0],  lines_ukf[3][0]),
           #('T measured', 'T filtered', 'T sim variable $\Theta$', 'T sim constant $\Theta$'),
           #loc='upper right'
 #)
-pl.legend((lines_ukf[0][0], lines_ukf[1][0]),('T measured', 'T filtered'),loc='upper right')   
-pl.title('Soda Temperature')
-pl.ylim([260, 300])
+pl.legend((lines_ukf[0][0], lines_ukf[1][0]),('T_{Soda} Measured', 'T_{Soda} Filtered'),loc='lower left')   
+pl.ylim([270, 290])
+pl.xlim([0, 10080])
+pl.xlabel('Time (Minutes)')
+pl.ylabel('Temperature (K)')
+pl.tight_layout()
+
+pl.subplot(3,1,1)
+pl.plot(To)
+pl.title('Ambient Temperature')
+pl.ylabel('Temperature (K)')
+pl.xlim([0, 10080])
+
+pl.subplot(3,1,2)
+pl.plot(d)
+pl.title('Compressor State (1 = On, 0 = Off')
+pl.xlabel('Time (Minutes)')
+pl.ylabel('State')
+pl.xlim([0, 10080])
+pl.tight_layout()
+"""
+################################################################################################
+#Day Subsection
+###############
+
+#Plot Fridge Temp
+pl.subplot(2,1,1)
+lines_ukf = []
+lines_ukf.append( pl.plot(Tf[1440:2880], color='r', ls='-') )
+lines_ukf.append( pl.plot(Tf_est[1444:2880], color='b', ls='--') )
+#lines_ukf.append( pl.plot(T_fridge_kplus, color='g', ls='-') )
+#lines_ukf.append( pl.plot(T_fridge_kplus_est, color='k', ls='-') )
+#pl.legend((lines_ukf[0][0], lines_ukf[1][0], lines_ukf[2][0],  lines_ukf[3][0]),
+          #('T measured', 'T filtered', 'T sim variable $\Theta$', 'T sim constant $\Theta$'),
+          #loc='upper right'
+#)
+pl.legend((lines_ukf[0][0], lines_ukf[1][0]),('$T_{Fridge}$ Measured', '$T_{Fridge}$ Filtered'),loc='lower right')
+pl.title('Temperature States')
+pl.xlim([0, 1440])
+pl.ylabel('Temperature (K)')
+#pl.ylim([270, 290])
+pl.yticks([279,280,281,282])
+
+
+#Plot Soda Temp
+pl.subplot(2,1,2)
+lines_ukf = []
+lines_ukf.append( pl.plot(Ts[1440:2880], color='r', ls='-') )
+lines_ukf.append( pl.plot(Ts_est[1440:2880], color='b', ls='--') )
+#lines_ukf.append( pl.plot(T_soda_kplus, color='g', ls='-') )
+#lines_ukf.append( pl.plot(T_soda_kplus_est, color='k', ls='-') )
+#pl.legend((lines_ukf[0][0], lines_ukf[1][0], lines_ukf[2][0],  lines_ukf[3][0]),
+          #('T measured', 'T filtered', 'T sim variable $\Theta$', 'T sim constant $\Theta$'),
+          #loc='upper right'
+#)
+pl.legend((lines_ukf[0][0], lines_ukf[1][0]),('$T_{Soda}$ Measured', '$T_{Soda}$ Filtered'),loc='lower right')   
+pl.xlim([0, 1440])
+pl.xlabel('Time (Minutes)')
+pl.ylabel('Temperature (K)')
+#pl.ylim([270, 290])
+pl.yticks([280,280.5,281])
+pl.tight_layout()
+"""
+pl.subplot(3,1,1)
+pl.plot(To[1440:2880])
+pl.title('Ambient Temperature')
+pl.ylabel('Temperature (K)')
+pl.xlim([0, 1440])
+pl.yticks(range(293,298))
+
+pl.subplot(3,1,2)
+pl.plot(d[1440:2880])
+pl.title('Compressor State (1 = On, 0 = Off)')
+pl.xlabel('Time (Minutes)')
+pl.ylabel('State')
+pl.xlim([0, 1440])
+pl.yticks([0,1])
+pl.tight_layout()
+"""
+
+####################################################################################
+"""
 #Plot Params
 pl.figure()
 lines_ukf = []
@@ -189,6 +276,12 @@ lines_ukf.append( pl.plot(p4, color='g', ls='-') )
 lines_ukf.append( pl.plot(p5, color='m', ls='-') )
 pl.legend((lines_ukf[0][0], lines_ukf[1][0], lines_ukf[2][0], lines_ukf[3][0], lines_ukf[4][0], lines_ukf[5][0]),
           ('p0','p1', 'p2', 'p3', 'p4', 'p5'),
-          loc='upper right'
+          loc='right'
 )
 pl.title('Parameters')
+pl.xlabel('Time (Minutes)')
+pl.ylabel('Filtered Value')
+pl.xlim([0, 13080])
+"""
+
+print p0[-1],p1[-1],p2[-1],p3[-1],p4[-1],p5[-1]
