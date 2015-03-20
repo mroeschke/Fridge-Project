@@ -36,7 +36,7 @@ measure_v = 1
 for i in range(states):
     transition_covariance[i][i] = measure_v  
     
-# Set diagonal for parameters (Not entirely sure why Eric set these values)
+# Set diagonal for parameters 
 param_v = 0.0012 # Lab
 for i in range(params):
     transition_covariance[i+states][i+states] = param_v  
@@ -64,7 +64,6 @@ for i in range(len(data)-10080,len(data)):
 # 0's = unknown parameters    
 observations = np.array(observations)
 
-#results are terrible if use # of obersvations as timesteps
 n_timesteps = 10080#int(observations.shape[0])
 n_dim_state = int(transition_covariance.shape[0])
 filtered_state_means = np.zeros((n_timesteps, n_dim_state))
