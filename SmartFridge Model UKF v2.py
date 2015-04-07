@@ -49,12 +49,12 @@ transition_covariance[4+states][4+states] = 0.000000001 # Constant
 observation_covariance = np.eye(states+params) 
 initial_state_mean = np.zeros(states+params)
 for i in range(4):
-    initial_state_mean[i] = 273.0
+    initial_state_mean[i] = 0
 initial_state_covariance = np.eye(states+params) 
 
 ###Load Observation from Data###
 #Output Data: Unix Time, Fridge Temp, Water Bottle Temp, Soda Bottle Temp, Ambient Temp, RMS Current, ON/OFF
-data = io.loadmat('fridge_data_3_12_15.mat')
+data = io.loadmat('fridge_data_3_12_15_celcius.mat')
 data = data['fridge']
 
 observations = []
@@ -223,7 +223,7 @@ pl.title('Temperature States')
 pl.xlim([0, 1440])
 pl.ylabel('Temperature (K)')
 #pl.ylim([270, 290])
-pl.yticks([279,280,281,282])
+#pl.yticks([279,280,281,282])
 
 
 #Plot Soda Temp
@@ -242,7 +242,7 @@ pl.xlim([0, 1440])
 pl.xlabel('Time (Minutes)')
 pl.ylabel('Temperature (K)')
 #pl.ylim([270, 290])
-pl.yticks([280,280.5,281])
+#pl.yticks([280,280.5,281])
 pl.tight_layout()
 """
 pl.subplot(3,1,1)
@@ -263,7 +263,7 @@ pl.tight_layout()
 """
 
 ####################################################################################
-"""
+
 #Plot Params
 pl.figure()
 lines_ukf = []
@@ -281,6 +281,6 @@ pl.title('Parameters')
 pl.xlabel('Time (Minutes)')
 pl.ylabel('Filtered Value')
 pl.xlim([0, 13080])
-"""
+
 
 print p0[-1],p1[-1],p2[-1],p3[-1],p4[-1],p5[-1]
