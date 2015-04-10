@@ -54,7 +54,7 @@ initial_state_covariance = np.eye(states+params)
 
 ###Load Observation from Data###
 #Output Data: Unix Time, Fridge Temp, Water Bottle Temp, Soda Bottle Temp, Ambient Temp, RMS Current, ON/OFF
-data = io.loadmat('fridge_data_3_12_15_celcius.mat')
+data = io.loadmat('/Users/zoltand/code/Fridge-Project/fridge_data_3_12_15_celcius.mat')
 data = data['fridge']
 
 observations = []
@@ -206,8 +206,8 @@ pl.tight_layout()
 #Plot Fridge Temp
 pl.subplot(2,1,1)
 lines_ukf = []
-lines_ukf.append( pl.plot(Tf[6000:7500], color='r', ls='-') )
-lines_ukf.append( pl.plot(Tf_est[6000:7500], color='b', ls='--') )
+lines_ukf.append( pl.plot(Tf, color='r', ls='-') )
+lines_ukf.append( pl.plot(Tf_est, color='b', ls='--') )
 #lines_ukf.append( pl.plot(T_fridge_kplus, color='g', ls='-') )
 #lines_ukf.append( pl.plot(T_fridge_kplus_est, color='k', ls='-') )
 #pl.legend((lines_ukf[0][0], lines_ukf[1][0], lines_ukf[2][0],  lines_ukf[3][0]),
@@ -216,7 +216,7 @@ lines_ukf.append( pl.plot(Tf_est[6000:7500], color='b', ls='--') )
 #)
 pl.legend((lines_ukf[0][0], lines_ukf[1][0]),('$T_{Fridge}$ Measured', '$T_{Fridge}$ Filtered'),loc='lower right')
 pl.title('Temperature States')
-pl.xlim([0, 1440])
+#pl.xlim([0, 1440])
 pl.ylabel('Temperature (K)')
 #pl.ylim([270, 290])
 #pl.yticks([279,280,281,282])
@@ -225,8 +225,8 @@ pl.ylabel('Temperature (K)')
 #Plot Soda Temp
 pl.subplot(2,1,2)
 lines_ukf = []
-lines_ukf.append( pl.plot(Ts[6000:7500], color='r', ls='-') )
-lines_ukf.append( pl.plot(Ts_est[6000:7500], color='b', ls='--') )
+lines_ukf.append( pl.plot(Ts, color='r', ls='-') )
+lines_ukf.append( pl.plot(Ts_est, color='b', ls='--') )
 #lines_ukf.append( pl.plot(T_soda_kplus, color='g', ls='-') )
 #lines_ukf.append( pl.plot(T_soda_kplus_est, color='k', ls='-') )
 #pl.legend((lines_ukf[0][0], lines_ukf[1][0], lines_ukf[2][0],  lines_ukf[3][0]),
@@ -234,7 +234,7 @@ lines_ukf.append( pl.plot(Ts_est[6000:7500], color='b', ls='--') )
           #loc='upper right'
 #)
 pl.legend((lines_ukf[0][0], lines_ukf[1][0]),('$T_{Soda}$ Measured', '$T_{Soda}$ Filtered'),loc='lower right')   
-pl.xlim([0, 1440])
+#pl.xlim([0, 1440])
 pl.xlabel('Time (Minutes)')
 pl.ylabel('Temperature (K)')
 #pl.ylim([270, 290])
@@ -281,8 +281,10 @@ pl.legend((lines_ukf[0][0], lines_ukf[1][0], lines_ukf[2][0], lines_ukf[3][0]),
 pl.title('Parameters')
 pl.xlabel('Time (Minutes)')
 pl.ylabel('Filtered Value')
-pl.xlim([6000, 7500])
-pl.ylim([-0.02, 0.03])
+#pl.xlim([6000, 7500])
+pl.ylim([-0.1, 0.1])
 
 
 print p0[-1],p1[-1],p2[-1],p3[-1]
+
+plt.show()

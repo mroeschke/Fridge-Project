@@ -38,10 +38,10 @@ def main():
 
     ###Load Observation from Data###
     #Output Data: Unix Time, Fridge Temp, Water Bottle Temp, Soda Bottle Temp, Ambient Temp, RMS Current, ON/OFF
-    dataIn = io.loadmat('fridge_data_3_12_15_celcius.mat')
+    dataIn = io.loadmat('fridge_data_4_9_15.mat')
     dataIn = dataIn['fridge']
-    start = -10000
-    end = -5000
+    start = -6080
+    end = -1
     # Observations: T_soda, T_fridge, T_ambient, compressor State
     data = {'t': range(end-start), 'T_s': dataIn[start:end,3], 'T_f': dataIn[start:end,1], 'T_a': dataIn[start:end,4], 'S_c': dataIn[start:end,6]}
 
@@ -65,9 +65,7 @@ def main():
     states0 = np.concatenate((x_hat0, np.reshape(Sig0, 4)))
 
     ## Simulate Kalman Filter
-    ##   This coding is a little complicated for novice Matlab users.
-    ##   Try to reverse engineer what I've done here.
-    states = inte.odeint(ode_kf,states0,data['t'],args=(A,B,C,input_data,W,N)) ## ode_kf(x,t,A,B[:,0],C,input_data,W,N)
+    states = inte.odeint(ode_kf,states0,data['t'],args=(A,B,C,input_data,W,N))
 
     ## Parse States
     T_s_hat = states[:,0]
@@ -109,7 +107,7 @@ def main():
     kfPlot[2].set_xlabel(r'Time [min]', fontsize=fs)
     kfPlot[2].set_ylim(-0.5, .5)
 
-    ## f3.savefig('code/ce295/hw3/HW3_5c.pdf')
+    f.savefig('ValidationData.pdf')
 
     plt.show()
 
@@ -122,7 +120,6 @@ def ode_kf(x,t,A,B,C,input_data,W,N):
     Sig = np.reshape(x[2:],(2,2))   ## Need to reshape Sigma from vector to matrix
     
     ## Parse and interpolate input signal data
-    ##   This is a coding trick for time-varying input data.
     it = input_data[0,:]
     iT_s = input_data[1,:]
     iT_f = input_data[2,:]
