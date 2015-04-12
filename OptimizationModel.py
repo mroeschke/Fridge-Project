@@ -22,14 +22,13 @@ plt.close('all')
 
 
 
-## Main Fridge Model ##
+## Setpoint Fridge Model ##
 #  Recieves a setpoint schedule and predicted ambient temperature
 #  Returns compressor state and soda and fridge temperature for every minute of the day
 
-def fridge(T_sp, T_amb, A, B, x0):
+def test_fridge(T_sp, T_amb, A, B, x0):
     C = np.eye(2)
     D = np.zeros((2,2))
-    #sys = ctrl.ss(A, B, C, D)
     T_amb = interp.interp1d([i*60 for i in range(25)], np.append(T_amb, T_amb[23]) ) # Interpolate ambient temp predictions
     t = range(1440)  # Minutes in the day
     values = np.zeros((4, 1441))  # Initialize the output data (0 = time, 1 = soda, 2 = fridge, 3 = Compressor)
@@ -63,6 +62,45 @@ def fridge(T_sp, T_amb, A, B, x0):
                 values[3, i+1] = 1
 
     return values
+
+
+def fridge(T_sp, T_amb, A, B, x0):
+    C = np.eye(2)
+    D = np.zeros((2,2))
+    T_amb = interp.interp1d([i*60 for i in range(25)], np.append(T_amb, T_amb[23]) ) # Interpolate ambient temp predictions
+    t = range(1440)  # Minutes in the day
+    values = np.zeros((4, 1441))  # Initialize the output data (0 = time, 1 = soda, 2 = fridge, 3 = Compressor)
+    values[0,:1440] = t
+    values[0,1440] = 1440
+    values[1:,0] = x0  # Initial condition at the beginning
+    minOn = 0
+    minOff = 5
+    for i in t:
+        u = np.array([T_amb(i), values[3,i]])
+        x = values[1:3, i]
+        #nextStep = ctrl.lsim(sys, u, [1,2], values[1:3, i])[2]
+        #values[1:3,i+1] = nextStep[1,:]
+        currentSP = T_sp[(int)(i/60.)]
+        values[1:3, i+1] = A.dot(x) + B.dot(u)
+        
+
+        if values[3, i] == 0. :
+            minOff += 1
+            if (values[2, i+1] > (currentSP+0.5) ) and (minOff >= 5) :
+                values[3, i+1] = 1
+                minOn = 0
+            else:
+                values[3, i+1] = 0
+        else:
+            minOn += 1
+            if ( ( (values[2, i+1] < (currentSP-0.5) ) and (minOn >= 5) ) or (minOn >= 20) ):
+                values[3, i+1] = 0
+                minOff = 0
+            else:
+                values[3, i+1] = 1
+
+    return values
+
 
 
 #### Weather Underground API
@@ -115,7 +153,7 @@ p1 = 0.0053631
 p2 = 0.0020665
 p3 = -0.15983
 
-## Rate Schedule
+## Rate Schedule (this is just a template until a real one is determined)
 RS = np.zeros((24))
 RS[0:9] = 0.07 # Off-peak
 RS[9:11] = 0.09 # Part-peak
@@ -131,7 +169,7 @@ CI_forecast = getWTForecast()
 
 ## Only simulate for time of shortest forecast
 simHours = min([len(T_forecast), len(CI_forecast)])
-
+dt = 5 # Timestep length
 
 T_sp = np.zeros((24))
 T_sp[0:8] = 10.
@@ -150,11 +188,11 @@ B_cont = np.array([[0,       0    ],
 X = np.zeros((4,4))
 X[0:2,0:2] = A_cont
 X[0:2,2:] = B_cont
-Y = LA.expm(X)
+Y = LA.expm(X*dt)
 A = Y[0:2,0:2]
 B = Y[0:2,2:]
 
-test = fridge(T_sp, T_amb, A, B, [10.,10.,0.])
+test = test_fridge(T_sp, T_amb, A, B, [10.,10.,0.])
 
 f2, (thAxis) = plt.subplots(3,1,sharex=True)
 f2.set_size_inches(6,9)
