@@ -107,11 +107,27 @@ def main():
     kfPlot[2].set_xlabel(r'Time [min]', fontsize=fs)
     kfPlot[2].set_ylim(-0.5, .5)
 
-    f.savefig('Kamlan Filter Results.pdf')
-    f.savefig('Kamlan Filter Results')
+    #f.savefig('Kamlan Filter Results.pdf')
+    #f.savefig('Kamlan Filter Results')
 
     plt.show()
+    
+    plt.figure().set_size_inches(9,9)
+    plt.subplot(2,1,1)
+    condition_lines =[]
+    condition_lines.append( plt.plot(input_data[0,:],input_data[3,:]))
+    plt.title('Inputs for Kamlan Filter')
+    plt.ylabel('Ambient Temperature [Celcius]')
+    
 
+    plt.subplot(2,1,2)
+    condition_lines =[]
+    condition_lines.append( plt.plot(input_data[0,:],input_data[4,:]))
+    plt.ylabel('Compressor State')
+    plt.xlabel('Time [Minutes]')
+    plt.tight_layout()
+    plt.savefig('State Estimation_Typical Input States.pdf')
+    plt.savefig('State Estimation_Typical Input States')
 
 ## Define function to integrate
 def ode_kf(x,t,A,B,C,input_data,W,N):

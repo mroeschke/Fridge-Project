@@ -151,7 +151,7 @@ condition_lines =[]
 condition_lines.append( plt.plot(dataArr[1,-1440:]))
 condition_lines.append( plt.plot(dataArr[2,-1440:]))
 condition_lines.append( plt.plot(dataArr[3,-1440:]))
-plt.title('States for Parameter Identification (Forced Control).pdf')
+plt.title('States for Parameter Identification (Forced Control)')
 plt.ylabel('Temperature [Celcius]')
 plt.legend((condition_lines[0][0], condition_lines[1][0], condition_lines[2][0]),
           ('$T_{Soda}$','$T_{Refrigerator}$', '$T_{Ambient}$'),loc='right')#,bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)

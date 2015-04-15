@@ -13,7 +13,7 @@ import scipy.linalg as LA
 # import scipy.io as io
 # import scipy.signal as signal
 # import scipy.integrate as inte
-import control.matlab as ctrl
+#import control.matlab as ctrl
 import requests as req
 import datetime as DT
 
@@ -171,7 +171,7 @@ thAxis[2].set_xlabel(r'Hour of Day', fontsize=fs)
 thAxis[2].set_xticks([0,6,12,18,24])
 thAxis[2].set_xlim([0,24])
 
-f2.savefig('ModelTest.pdf')
+#f2.savefig('ModelTest.pdf')
 
 plt.show()
 

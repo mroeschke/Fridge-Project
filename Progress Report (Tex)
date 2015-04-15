@@ -1,0 +1,294 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Journal Article
+% LaTeX Template
+% Version 1.3 (9/9/13)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Frits Wenneker (http://www.howtotex.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[twoside]{article}
+
+\usepackage[sc]{mathpazo} % Use the Palatino font
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+\linespread{1.05} % Line spacing - Palatino needs more space between lines
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+
+\usepackage[hmarginratio=1:1,top=32mm,columnsep=20pt]{geometry} % Document margins
+\usepackage{multicol} % Used for the two-column layout of the document
+\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption} % Custom captions under/above floats in tables or figures
+\usepackage{booktabs} % Horizontal rules in tables
+\usepackage{float} % Required for tables and figures in the multi-column environment - they need to be placed in specific locations with the [H] (e.g. \begin{table}[H])
+\usepackage{hyperref} % For hyperlinks in the PDF
+
+\usepackage{lettrine} % The lettrine is the first enlarged letter at the beginning of the text
+\usepackage{paralist} % Used for the compactitem environment which makes bullet points with less space between them
+
+\usepackage{abstract} % Allows abstract customization
+\renewcommand{\abstractnamefont}{\normalfont\bfseries} % Set the "Abstract" text to bold
+\renewcommand{\abstracttextfont}{\normalfont\small\itshape} % Set the abstract itself to small italic text
+
+\usepackage{titlesec} % Allows customization of titles
+\renewcommand\thesection{\Roman{section}} % Roman numerals for the sections
+\renewcommand\thesubsection{\arabic{subsection}} % Numbers for subsections
+\titleformat{\section}[block]{\large\scshape\centering}{\thesection.}{1em}{} % Change the look of the section titles
+\titleformat{\subsection}[block]{\em}{\thesubsection.}{1em}{} % Change the look of the subsection titles
+
+\usepackage{fancyhdr} % Headers and footers
+\pagestyle{fancy} % All pages have headers and footers
+\fancyhead{} % Blank out the default header
+\fancyfoot{} % Blank out the default footer
+\fancyhead[C]{Smart Vending Machine Progress Report $\bullet$ CE 295 - Spring 2015 $\bullet$ Prof. Moura} % Custom header text
+\fancyfoot[RO,LE]{\thepage} % Custom footer text
+
+\usepackage{graphicx} % For figure graphics
+\usepackage{wrapfig}
+\usepackage{gensymb}
+\usepackage{amsmath}
+\usepackage{capt-of}
+
+\setlength{\parskip}{1pt}
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\title{\vspace{-15mm}\fontsize{24pt}{10pt}\selectfont\textbf{Load Management Strategies for a Smart Beverage Vending Machine}} % Article title
+
+\author{
+\large
+\textsc{Zoltan DeWitt and Matthew Roeschke}\\[2mm] % Your name
+\normalsize University of California, Berkeley \\ % Your institution
+\vspace{-5mm}
+}
+\date{}
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\maketitle % Insert title
+
+\thispagestyle{fancy} % All pages have headers and footers
+
+%----------------------------------------------------------------------------------------
+%	ABSTRACT
+%----------------------------------------------------------------------------------------
+
+\begin{abstract}
+
+\noindent
+The prevalent soda vending machine industry in the US could yield reductions in energy consumption by addressing operational use. A study by the National Renewable Energy Laboratory estimates that each of the 4.6 million vending machines in the US consumes between 7 and 13kWh per day[1]. Currently, soda vending machines keep their products at a constant temperature regardless of the time of day. Although no formal soda vending machine usage patterns have been observed, we hypothesize that usage patterns primarily follow time of day with high utilization during midday and afternoon and low utilization during the night and morning. However, soda is generally non-perishable and does not need to be refrigerated during periods of low to no soda demand. In this report, we construct a thermodynamic, state space refrigerator model and integrate a hypothetical soda demand schedule in order to optimize the operation of a soda vending machine that minimizes energy and carbon impact while maximizing the delivery of the appropriately chilled soda.
+
+\end{abstract}
+
+%----------------------------------------------------------------------------------------
+%	ARTICLE CONTENTS
+%----------------------------------------------------------------------------------------
+
+\begin{multicols}{2} % Two-column layout throughout the main article text
+
+\begin{figure*}[ht!]
+\includegraphics[width=6in]{refrigerator-ee-stds.png}
+\caption{Refrigerator Energy Use Over Time \cite{NREL}}
+\label{nrelgraph}
+\end{figure*}
+
+\section{Introduction}
+
+\lettrine[nindent=0em,lines=3]{R}efrigeration, and space conditioning in general, occupies a reasonably large portion of the total energy usage in the United States. The U.S. Department of Energy estimates that refrigeration accounts for approximately 7\% of total commercial building energy usage. The bygone era of cheap and plentiful electricity provided little incentive to push for more efficient refrigerators in both the home and commercial installations. Gradually, the energy consumption per refrigerator unit increased, outpacing the rate at which the physical size of each refrigerator unit was growing (Figure \ref{nrelgraph}). Regulations at both the state and federal level were enacted which finally required steady reductions in the energy usage of these appliances; refrigerator energy consumption began to decline dramatically afterwards. Clearly, without any incentive to increase efficiency, little technological improvements were made in the refrigerator sector.
+\par
+The commercial, soda vending machine sector faces an economic obstacle that hinders the incentives for increased energy efficiency. Most vending machines are owned by a vending or beverage company which contracts with building managers to have a machine placed on their premises. This arrangement sets an economic disconnect between the owner of the machine (the vending company) and the payer of the electrical bill (the building manager). The vending company is not incentivized to improve the energy efficiency of their equipment since they do not pay for the energy consumption. Also, no Energy Star rating is currently established for soda vending machines, although there is some movement to establish one.\cite{NREL}
+\par
+Refrigerated devices have gained significant interest for dynamic demand management in the power utility sector as these devices are viewed as a flexible, energy storage resource. Refrigerated systems can help stabilize power demand fluctuations in the grid by advancing or retarding their cooling cycles while still staying within a desired temperature band. Large thermal ballasts inside the refrigerated areas help to keep the temperature more stable during periods when it may be desirable to shut off the compressor for grid-related reasons.\cite{callaway2009}
+\par
+While these special "ancillary" services for reliability management are of interest for all thermostatically controlled loads, soda vending machines are of unique interest because soda has a much wider, acceptable temperature range. While most commercial refrigeration units must keep perishables below 40\degree F, soda has no storage temperature restriction except to serve the product acceptably cold the moment it is sold. Currently, vending machines operate to keep soda cold at all times in case someone wants to purchase one. We believe that the energy consumption of vending machines can be significantly reduced by regulating the setpoint temperature based on a thermal model of the vending machine and soda demand throughout the day.
+
+
+%------------------------------------------------
+\section{Technical Description}
+
+\subsection{Testbed and Data Acquisition}
+
+\begin{figure*}[ht!]
+\includegraphics[width=0.5\textwidth]{logger.JPG}
+\includegraphics[width=0.5\textwidth]{insideFridge.JPG}
+\caption{Data Acquisition Equipment}
+\label{equipment}
+\end{figure*}
+
+\par
+Our testbed for this project consists of a mini-fridge, an Arduino microcontroller, four temperature sensors, and one current sensor connected to the fridge compressor (Figure \ref{equipment}). The temperature sensors measure the main refrigerator compartment temperature, soda bottle temperature, water bottle temperature, and ambient room temperature. The microcontroller also controls the actuation of the refrigerator compressor, receiving commands to maintain a setpoint temperature within the bounds of a specified deadband width. In order to better simulate a well-mixed environment such as in a commercial vending machine, a fan was added inside the fridge cavity.
+\par 
+The microcontroller performs two main functions: temperature data logging and deadband control. The temperature readings from each sensor are logged at one-minute intervals and stored on a memory card for later analysis. In order to adapt this model to a commercial machine, a separate temperature data set would need to be acquired from a test unit and analyzed. However, this setup can serve as a proof of concept for these methods. Only in this test machine is there a need for more than one sensor; a commercial unit would only monitor the fridge temperature.
+\par 
+Deadband control is also performed by the microcontroller, keeping the fridge temperature within a certain bounds. The target setpoint is programmable on an hourly basis for a 24-hour period. This setpoint schedule would eventually be used in a commercial unit,  possibly receiving daily values from a remote server. During our test phase, this schedule was adjusted several times to collect a range of data that would result in a more accurate regression.
+
+\subsection{Nomenclature}
+
+\begin{align*}
+C_s &= \text{Thermal Capacitance of soda}\\
+C_f &= \text{Thermal Capacitance of refrigerator air}\\
+R_s &= \text{Thermal Resistance of soda container}\\
+R_f &= \text{Thermal Resistance of refrigerator wall}\\
+Q_c &= \text{Compressor Heat Power}\\
+T_s &= \text{Temperature of soda}\\
+T_f &= \text{Temperature of refrigerator air}\\
+T_o &= \text{Temperature of ambient air}\\
+T_{pred} &= \text{Hourly temperature forecast}\\
+T_{opt} &= \text{Optimal soda temperature}\\
+s &= \text{Compressor state (1 = on, 0 = off)}\\
+RS &= \text{Rate schedule for electric power}\\
+EF &= \text{Emission factor for electric power}\\
+T_{sp} &= \text{Temperature setpoint schedule}\\
+\theta &= \text{Identified fridge parameters}\\
+DS &= \text{Soda demand schedule}
+\end{align*}
+
+
+\subsection{Modeling}
+\par
+The modeling objective is to understand how the soda temperature behaves given the temperature of the refrigerator which is influenced by ambient temperature and refrigerator compressor. The temperature dynamics of the soda and refrigerator is governed by the heat transfer between the soda, refrigerator air, ambient air outside the refrigerator, and heat removed by the compressor. Mathematically, the refrigerator and soda temperature evolve according to the following equations:
+
+\begin{equation}
+C_s\frac{dT_s}{dt} = \frac{1}{R_s}(T_f(t)-T_s(t))
+\end{equation}
+
+\begin{multline}
+C_f\frac{dT_f}{dt} = \frac{1}{R_r}(T_o(t)-T_f(t)) \\+ \frac{1}{R_s}(T_s(t)-T_f(t)) + Q_{c}s(t)
+\end{multline}
+
+\par
+The states, \(T_s\) and \(T_f\), are to be estimated given the uncontrollable input, \(T_o\), and controllable input, \(s\). The unknown parameters of this model are \(C_s,C_f,R_s,R_f,Q_c\) and assumed to be independent. 
+
+\subsection{State and Parameter Estimation}
+\par
+The target states evolve according to the following equations:
+
+\begin{equation}
+\dot{x}_1 = \frac{1}{R_sC_s}x_2 - \frac{1}{R_sC_s}x_1
+\end{equation}
+
+\begin{multline}
+\dot{x}_2 = \frac{1}{R_fC_f}u_1 - \frac{1}{R_fC_f}x_2 \\+ \frac{1}{R_sC_f}x_1 - \frac{1}{R_sC_f}x_2 + \frac{Q_c}{C_f}u_2
+\end{multline}
+
+Where \(x_1\) and \(x_2\) are the soda and referigerator states respectively and \(u_1\) and \(u_2\) are the ambient temperature and compressor state inputs respectively. 
+
+Given that the parameters are independet but potentially time varying, these parameters are treated as states with the following assignments:
+
+\begin{align*}
+p_0 &= -\frac{1}{R_sC_s} & 
+p_1 &= \frac{1}{R_sC_s} & 
+p_2 &= \frac{1}{R_sC_f} \\ 
+p_3 &= -(\frac{1}{R_fC_f} +\frac{1}{R_sC_f}) &
+p_4 &= \frac{1}{R_fC_f} & 
+p_5 &= \frac{Q_c}{C_f}
+\end{align*}
+
+Although these parameter states are potentially time varying, they are assumed to have a time derivative of zero. Therefore, the state dynamics can be rearranged and summarized with the following equations:
+
+\begin{equation}
+\dot{x}_1 = p_0x_1 + p_1x_2
+\end{equation}
+
+\begin{equation}
+\dot{x}_2 = p_2x_1 + p_3x_2 + p_4u_1 + p_5u_2
+\end{equation}
+
+\begin{align}
+\dot{x}_i &= 0  & \forall i = 0,1,..5
+\end{align}
+
+This formulation of the state dynamics is nonlinear; therefore, a Unscented Kalman Filter is used to estimate the states and parameters of this system. (The state and parameter estimation procedure adapted from \cite{massoumy2014}.)
+
+\subsection{State and Parameter Estimation Results}
+
+\par
+Soda temperature, refrigerator temperature, ambient temperature, and current (which was used to determine compressor state) was measured from the test bed at one minute intervals for one week. Two different control schemes were tested during the week as seen in the one day examples in Figures \ref{Measured Inputs} and \ref{Measured States}. The first control scheme was a standard, refrigerator temperature control scheme based on a fixed set point temperature and dead-band. The second control scheme involved deactivating the compressor for an extended period of time then implementing rapid cooling to simulate a potential, overnight vending machine control strategy. 
+
+The Unscented Kalman Filter provide an excellent estimation of the refrigerator and soda temperature sates for both control schemes. The root mean squared error between the measured and filtered states were 0.19 and 0.24 for the soda and refrigerator temperature respectively. Additionally, the parameter estimates reached their steady state values quickly (Figure \ref{Parameter Estimation Graph}). The estimated parameter values can be seen in Table \ref{Parameter Table}.
+\begin{figure*}%--- The t is for 'top' or b for 'bottom'(gotcha thanks!)
+\includegraphics[width=0.5\textwidth]{Measured_Inputs__Forced_Control_.png}
+\includegraphics[width=0.5\textwidth]{Measured_Inputs__Normal_Control_.png}
+\caption{Compressor and Ambient Temperature Inputs (Left: Custom Control, Right: Normal Control)}
+\label{Measured Inputs}
+\includegraphics[width=0.5\textwidth]{Measured_States__Forced_Control_.png}
+\includegraphics[width=0.5\textwidth]{Measured_States__Normal_Control_.png}
+\caption{Temperature States (Left: Custom Control, Right: Normal Control)}
+\label{Measured States}
+\end{figure*}
+
+\begin{figure*}
+\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\vspace{0pt}
+\includegraphics[width=\textwidth]{Parameter_Estimation.png}
+\caption{Parameter Estimation with Unscented Kalman Filter}
+\label{Parameter Estimation Graph}
+\end{minipage}\hfill
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\vspace{0pt}
+\captionof{table}{Parameter Estimates}
+\begin{tabular}{c|c}
+\hline
+\(p_0\) & \(5.0\times 10^{-1}\) \\
+\(p_1\) & \(5.0\times 10^{-1}\) \\
+\(p_2\) & \(3.2\times 10^{-1}\) \\
+\(p_3\) & \(3.2\times 10^{-1}\) \\
+\(p_4\) & \(3.4\times 10^{-1}\) \\
+\(p_5\) & \(4.1\times 10^{-4}\) \\
+\hline
+\label{Parameter Table}
+\end{tabular}
+\end{minipage}
+\end{figure*}
+
+
+\subsection{Optimization Problem}
+\par
+The main objective of this study is to find an optimal setpoint schedule that will minimize a cost function consisting of energy cost, CO$_2$ emissions, and deviation from optimal soda temperature. We formulate a general function as follows:
+
+\begin{multline}
+\min_{T_{sp}} \lambda_{cost}*C(F, RS) + \lambda_{emis}*E(F, EF)\\ + \lambda_{temp}*T(F, DS, T_{opt}) 
+\end{multline}
+
+Our fridge model, $F(T_{sp}, T_{pred}, \theta)$, is a function of the setpoint schedule, the temperature forecast, and the identified parameters. This function will return vectors containing the modeled $T_f, T_s,$ and $S$ values for the day.
+\par
+Each of the cost terms is a function of several inputs, and the $\lambda$ coefficients allow selective weighting to each term in the function. The energy cost term, $C$ [\$], is a function of the fridge model $F$ and the electricity rate schedule $RS$. The emissions term, $E$ [kg CO$_2$e], is a function of the fridge model and the emissions factor schedule $EF$. The temperature deviation term, $T$ [drink-\degree C] is a function of the fridge model, the soda demand schedule $DS$, and the optimum soda temperature $T_{opt}$. 
+
+
+%------------------------------------------------------------
+
+\section{Summary}
+
+
+The current operation of soda vending machines can see significant reduction in energy consumption and carbon impact by integrating information about when consumers access these machines. Current vending machine operation continually and unnecessarily chills non-perishable sodas during periods of low to no demand, creating an opportunity for energy and cost savings. A thermodynamic, state space model was created by gathering data from a refrigerator, a proxy to a vending machine, in order to understand the temperature dynamics of the sodas when the refrigerator compressor is running or is idling. A simulation was then performed to evaluate the potential energy, carbon dioxide, and monetary savings if refrigerator operation were to follow a soda demand schedule. Depending on the significance of the results, we hope to persuade soda vending machine companies to implement a human behavior control strategy in order to optimize soda vending machine operation.
+
+%----------------------------------------------------------------------------------------
+%	REFERENCE LIST
+%----------------------------------------------------------------------------------------
+
+
+\bibliographystyle{amsplain}
+\bibliography{proposalbib}
+
+
+%----------------------------------------------------------------------------------------
+
+\end{multicols}
+
+\end{document}
