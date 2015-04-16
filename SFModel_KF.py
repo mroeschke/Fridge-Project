@@ -82,22 +82,22 @@ def main():
     ## Plot Results
     f, (kfPlot) = plt.subplots(3,1, sharex=True)
     f.set_size_inches(9,9)
-
+    
     ##   Plot true and estimated soda temp plus/minus one sigma
-    kfPlot[0].fill_between(data['t'], T_s_hat_lowerbound, T_s_hat_upperbound, alpha=0.1, color='k', label=r'One std. dev.')
+    kfPlot[0].fill_between(data['t'], T_s_hat_lowerbound, T_s_hat_upperbound, alpha=0.1, color='k', label=r'One Standard Deviation')
     kfPlot[0].plot(data['t'],data['T_s'], 'g-', label='Measured')
     kfPlot[0].plot(data['t'],T_s_hat, 'r--', label='Estimated')
-    kfPlot[0].plot([], [], 'k-', label=r'One std. dev.', linewidth=10, alpha=0.1) ## Dummy plot for legend
-    kfPlot[0].set_ylabel(r'Soda Temp [deg C]', fontsize=fs)
+    kfPlot[0].plot([], [], 'k-', label=r'One Standard Deviation', linewidth=10, alpha=0.1) ## Dummy plot for legend
+    kfPlot[0].set_ylabel(r'Soda Temp [Celcius]', fontsize=fs)
     kfPlot[0].set_ylim(0,18)
     kfPlot[0].legend(fontsize=10)
-
+    kfPlot[0].set_title('State Estimation of Soda and Referigerator Temeratures with Kalman Filter')
      ##   Plot true and estimated fridge temp plus/minus one sigma
-    kfPlot[1].fill_between(data['t'], T_f_hat_lowerbound, T_f_hat_upperbound, alpha=0.1, color='k', label=r'One std. dev.')
+    kfPlot[1].fill_between(data['t'], T_f_hat_lowerbound, T_f_hat_upperbound, alpha=0.1, color='k', label=r'One Standard Deviation')
     kfPlot[1].plot(data['t'],data['T_f'], 'g-', label='Measured')
     kfPlot[1].plot(data['t'],T_f_hat, 'r--', label='Estimated')
-    kfPlot[1].plot([], [], 'k-', label=r'One std. dev.', linewidth=10, alpha=0.1) ## Dummy plot for legend
-    kfPlot[1].set_ylabel(r'Fridge Temp [deg C]', fontsize=fs)
+    kfPlot[1].plot([], [], 'k-', label=r'One Standard Deviation', linewidth=10, alpha=0.1) ## Dummy plot for legend
+    kfPlot[1].set_ylabel(r'Fridge Temperature [Celcius]', fontsize=fs)
     kfPlot[1].set_ylim(0,18)
     kfPlot[1].legend(fontsize=10)
 
@@ -107,10 +107,27 @@ def main():
     kfPlot[2].set_xlabel(r'Time [min]', fontsize=fs)
     kfPlot[2].set_ylim(-0.5, .5)
 
-    f.savefig('ValidationData.pdf')
+    #f.savefig('Kamlan Filter Results.pdf')
+    #f.savefig('Kamlan Filter Results')
 
     plt.show()
+    
+    plt.figure().set_size_inches(9,9)
+    plt.subplot(2,1,1)
+    condition_lines =[]
+    condition_lines.append( plt.plot(input_data[0,:],input_data[3,:]))
+    plt.title('Inputs for Kamlan Filter')
+    plt.ylabel('Ambient Temperature [Celcius]')
+    
 
+    plt.subplot(2,1,2)
+    condition_lines =[]
+    condition_lines.append( plt.plot(input_data[0,:],input_data[4,:]))
+    plt.ylabel('Compressor State')
+    plt.xlabel('Time [Minutes]')
+    plt.tight_layout()
+    plt.savefig('State Estimation_Typical Input States.pdf')
+    plt.savefig('State Estimation_Typical Input States')
 
 ## Define function to integrate
 def ode_kf(x,t,A,B,C,input_data,W,N):

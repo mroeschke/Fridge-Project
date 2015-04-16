@@ -108,7 +108,7 @@ thAxis[2].legend(fontsize=10)
 thAxis[3].legend(fontsize=10)
 thAxis[3].set_xlabel(r'Minutes', fontsize=fs)
 """
-plt.figure()
+plt.figure().set_size_inches(9,9)
 param_lines = []
 param_lines.append( plt.plot(y[:,0], color='y', ls='-') ) #p0?
 param_lines.append( plt.plot(y[:,1], color='r', ls='-') ) #p1?
@@ -119,44 +119,53 @@ plt.legend((param_lines[0][0], param_lines[1][0], param_lines[2][0], param_lines
           loc='right'
 )
 plt.title('Parameters')
-plt.xlabel('Time (Minutes)')
+plt.xlabel('Time [Minutes]')
 plt.ylabel('Filtered Value')
+plt.savefig('Parameter Estimates.pdf')
+plt.savefig('Parameter Estimates')
 
-plt.figure()
+plt.figure().set_size_inches(9,9)
 plt.subplot(2,1,1)
 condition_lines =[]
 condition_lines.append( plt.plot(dataArr[1,1:1440]))
 condition_lines.append( plt.plot(dataArr[2,1:1440]))
 condition_lines.append( plt.plot(dataArr[3,1:1440]))
 plt.title('States for Parameter Identification (Typical Control)')
-plt.ylabel('Temperature (Celcius)')
+plt.ylabel('Temperature [Celcius]')
 plt.legend((condition_lines[0][0], condition_lines[1][0], condition_lines[2][0]),
-          ('$T_{Soda}$','$T_{Refrigerator}$', '$T_{Ambient}$'),bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+          ('$T_{Soda}$','$T_{Refrigerator}$', '$T_{Ambient}$'),loc='right')#,bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
 plt.subplot(2,1,2)
 condition_lines =[]
 condition_lines.append( plt.plot(dataArr[4,1:1440]))
 plt.ylabel('Compressor State')
-plt.xlabel('Time (Minutes)')
+plt.xlabel('Time [Minutes]')
 plt.tight_layout()
+plt.savefig('Parameter Estimation_Typical Control States.pdf')
+plt.savefig('Parameter Estimation_Typical Control States')
 
-plt.figure()
+
+plt.figure().set_size_inches(9,9)
 plt.subplot(2,1,1)
 condition_lines =[]
 condition_lines.append( plt.plot(dataArr[1,-1440:]))
 condition_lines.append( plt.plot(dataArr[2,-1440:]))
 condition_lines.append( plt.plot(dataArr[3,-1440:]))
 plt.title('States for Parameter Identification (Forced Control)')
-plt.ylabel('Temperature (Celcius)')
+plt.ylabel('Temperature [Celcius]')
 plt.legend((condition_lines[0][0], condition_lines[1][0], condition_lines[2][0]),
-          ('$T_{Soda}$','$T_{Refrigerator}$', '$T_{Ambient}$'),bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+          ('$T_{Soda}$','$T_{Refrigerator}$', '$T_{Ambient}$'),loc='right')#,bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
 plt.subplot(2,1,2)
 condition_lines =[]
 condition_lines.append( plt.plot(dataArr[4,-1440:]))
 plt.ylabel('Compressor State')
-plt.xlabel('Time (Minutes)')
+plt.xlabel('Time [Minutes]')
 plt.tight_layout()
+plt.savefig('Parameter Estimation_Forced Control States.pdf')
+plt.savefig('Parameter Estimation_Forced Control States')
+
+
 ## f.savefig('/Users/zoltand/code/')
 
 plt.show()
