@@ -55,7 +55,7 @@ def ode_gradient(theta_h_vect,t,dataIn,Gam):
     epsilon = (z - theta_h.T.dot(phi))/msq
 
     ## Update Law
-    theta_h_dot = Gam * epsilon.dot(phi.T).T
+    theta_h_dot = Gam * phi.dot(epsilon.T)
     returnVal = np.reshape(theta_h_dot, 6)
     return returnVal
 
