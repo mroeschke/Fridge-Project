@@ -24,75 +24,36 @@ plt.close('all')
 
 ## Setpoint Fridge Model ##
 #  Recieves a setpoint schedule and predicted ambient temperature
-#  Returns compressor state and soda and fridge temperature for every minute of the day
+#  Returns compressor state and soda and fridge temperature for every timestep of the day
 
-def test_fridge(T_sp, T_amb, A, B, x0):
+def test_fridge(T_sp, T_amb, A, B, x0, dt):
     C = np.eye(2)
     D = np.zeros((2,2))
-    T_amb = interp.interp1d([i*60 for i in range(25)], np.append(T_amb, T_amb[23]) ) # Interpolate ambient temp predictions
-    t = range(1440)  # Minutes in the day
-    values = np.zeros((4, 1441))  # Initialize the output data (0 = time, 1 = soda, 2 = fridge, 3 = Compressor)
-    values[0,:1440] = t
-    values[0,1440] = 1440
+    T_amb = interp.interp1d([(i*60)/dt for i in range(25)], np.append(T_amb, T_amb[23]) ) # Interpolate ambient temp predictions
+    N = int(1440/dt)  # Timesteps in the day
+    t = range(N)
+    values = np.zeros((4, N+1))  # Initialize the output data (0 = time, 1 = soda, 2 = fridge, 3 = Compressor)
+    values[0,:N] = t
+    values[0,N] = N
     values[1:,0] = x0  # Initial condition at the beginning
     minOn = 0
     minOff = 5
     for i in t:
         u = np.array([T_amb(i), values[3,i]])
         x = values[1:3, i]
-        #nextStep = ctrl.lsim(sys, u, [1,2], values[1:3, i])[2]
-        #values[1:3,i+1] = nextStep[1,:]
-        currentSP = T_sp[(int)(i/60.)]
+        currentSP = T_sp[int(i*dt/60.)]
         values[1:3, i+1] = A.dot(x) + B.dot(u)
         
 
         if values[3, i] == 0. :
-            minOff += 1
+            minOff += dt
             if (values[2, i+1] > (currentSP+0.5) ) and (minOff >= 5) :
                 values[3, i+1] = 1
                 minOn = 0
             else:
                 values[3, i+1] = 0
         else:
-            minOn += 1
-            if ( ( (values[2, i+1] < (currentSP-0.5) ) and (minOn >= 5) ) or (minOn >= 20) ):
-                values[3, i+1] = 0
-                minOff = 0
-            else:
-                values[3, i+1] = 1
-
-    return values
-
-
-def fridge(T_sp, T_amb, A, B, x0):
-    C = np.eye(2)
-    D = np.zeros((2,2))
-    T_amb = interp.interp1d([i*60 for i in range(25)], np.append(T_amb, T_amb[23]) ) # Interpolate ambient temp predictions
-    t = range(1440)  # Minutes in the day
-    values = np.zeros((4, 1441))  # Initialize the output data (0 = time, 1 = soda, 2 = fridge, 3 = Compressor)
-    values[0,:1440] = t
-    values[0,1440] = 1440
-    values[1:,0] = x0  # Initial condition at the beginning
-    minOn = 0
-    minOff = 5
-    for i in t:
-        u = np.array([T_amb(i), values[3,i]])
-        x = values[1:3, i]
-        #nextStep = ctrl.lsim(sys, u, [1,2], values[1:3, i])[2]
-        #values[1:3,i+1] = nextStep[1,:]
-        currentSP = T_sp[(int)(i/60.)]
-        values[1:3, i+1] = A.dot(x) + B.dot(u)
-        
-
-        if values[3, i] == 0. :
-            minOff += 1
-            if (values[2, i+1] > (currentSP+0.5) ) and (minOff >= 5) :
-                values[3, i+1] = 1
-                minOn = 0
-            else:
-                values[3, i+1] = 0
-        else:
-            minOn += 1
+            minOn += dt
             if ( ( (values[2, i+1] < (currentSP-0.5) ) and (minOn >= 5) ) or (minOn >= 20) ):
                 values[3, i+1] = 0
                 minOff = 0
@@ -169,7 +130,10 @@ CI_forecast = getWTForecast()
 
 ## Only simulate for time of shortest forecast
 simHours = min([len(T_forecast), len(CI_forecast)])
-dt = 5 # Timestep length
+dt = 1 # Timestep length
+current_min = DT.datetime.now().minute
+ts_offset = int(current_min/dt)
+N = int((simHours*60/dt) - ts_offset)
 
 T_sp = np.zeros((24))
 T_sp[0:8] = 10.
@@ -189,20 +153,21 @@ X = np.zeros((4,4))
 X[0:2,0:2] = A_cont
 X[0:2,2:] = B_cont
 Y = LA.expm(X*dt)
-A = Y[0:2,0:2]
-B = Y[0:2,2:]
+A_disc = Y[0:2,0:2]
+B_disc = Y[0:2,2:]
 
-test = test_fridge(T_sp, T_amb, A, B, [10.,10.,0.])
+'''
+test = test_fridge(T_sp, T_amb, A_disc, B_disc, [10.,10.,0.], dt)
 
 f2, (thAxis) = plt.subplots(3,1,sharex=True)
 f2.set_size_inches(6,9)
-thAxis[0].plot((test[0,:]/60.), test[1,:], 'b-', label=r'Soda Temp')
+thAxis[0].plot((test[0,:]*dt/60.), test[1,:], 'b-', label=r'Soda Temp')
 thAxis[0].legend(fontsize=10)
 #thAxis[0].set_ylim([0,20])
-thAxis[1].plot((test[0,:]/60.), test[2,:], 'b-', label=r'Fridge Temp')
+thAxis[1].plot((test[0,:]*dt/60.), test[2,:], 'b-', label=r'Fridge Temp')
 thAxis[1].legend(fontsize=10)
 #thAxis[1].set_ylim([0,20])
-thAxis[2].plot((test[0,:]/60.), test[3,:], 'b-', label=r'Compressor')
+thAxis[2].plot((test[0,:]*dt/60.), test[3,:], 'b-', label=r'Compressor')
 thAxis[2].legend(fontsize=10)
 thAxis[2].set_ylim([0,1.5])
 thAxis[2].set_xlabel(r'Hour of Day', fontsize=fs)
@@ -210,6 +175,7 @@ thAxis[2].set_xticks([0,6,12,18,24])
 thAxis[2].set_xlim([0,24])
 
 #f2.savefig('ModelTest.pdf')
+'''
 
 plt.show()
 
