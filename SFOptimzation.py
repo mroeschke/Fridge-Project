@@ -10,6 +10,7 @@ import numpy as np
 import scipy.linalg as LA
 import openopt as opt
 import matplotlib.pyplot as plt
+from sklearn import preprocessing
 
 def getWUForecast():
     c = req.get('http://api.wunderground.com/api/514ebcd01c166ac3/conditions/q/CA/San_Francisco.json')
@@ -193,7 +194,7 @@ b = np.concatenate((b_compressor_highbound,b_compressor_lowbound,b_soda_schedule
 ######################
 #Solve Optimization
 ######################
-
+"""
 intVars = range(s_states)
 ub = np.inf*np.ones((total_states))
 ub[intVars] = 1
@@ -222,7 +223,7 @@ axis[1].set_ylabel('Soda Temperature [Celcuis]')
 axis[1].plot([], [], 'k-', label=r'Temperature Schedule', linewidth=10, alpha=0.1) ## Dummy plot for legend
 axis[1].legendlegend(fontsize=10)
 
-
+"""
 
 
 
