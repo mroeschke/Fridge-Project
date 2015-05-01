@@ -98,7 +98,7 @@ RS[0:9*min2hour] = 0.07 # Off-peak
 RS[9*min2hour:11*min2hour] = 0.09 # Part-peak
 RS[11*min2hour:17*min2hour] = 0.12 # Peak
 RS[17*min2hour:21*min2hour] = 0.09 # Part-peak
-RS[21*min2hour:] = 0.07 # Off-peak
+RS[21*min2hour:24*min2hour] = 0.07 # Off-peak
     
 ######################
 #Equality Contraints
@@ -212,7 +212,7 @@ Tf_opt = r.xf[Ts_states+1:]
 fig, (axis) = plt.subplots(2,1, sharex=True)
 fig.set_size_inches(6,6)
 t_0 = range(len(compressor_opt))
-axis[0].plot(t_0,r.compressor_opt,'b-') 
+axis[0].plot(t_0,compressor_opt,'b-') 
 axis[0].set_ylabel('Compressor State')
 axis[0].set_ylim(-.2,1.2)
 
