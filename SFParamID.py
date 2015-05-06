@@ -135,7 +135,7 @@ plt.title('States for Parameter Identification (Typical Control)', fontsize=16)
 plt.ylabel('Temperature [Celcius]',fontsize=15)
 plt.tick_params(labelsize=15)
 plt.legend((condition_lines[0][0], condition_lines[1][0], condition_lines[2][0]),
-          ('$T_{Soda}$','$T_{Refrigerator}$', '$T_{Ambient}$'),loc='right',fontsize=15)#,bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+          ('$T_{Soda}$','$T_{Refrigerator}$', '$T_{Ambient}$'),loc='left',fontsize=17)#,bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
 plt.subplot(2,1,2)
 condition_lines =[]
@@ -158,7 +158,7 @@ plt.tick_params(labelsize=15)
 plt.title('States for Parameter Identification (Forced Control)', fontsize=16)
 plt.ylabel('Temperature [Celcius]',fontsize=15)
 plt.legend((condition_lines[0][0], condition_lines[1][0], condition_lines[2][0]),
-          ('$T_{Soda}$','$T_{Refrigerator}$', '$T_{Ambient}$'),loc='right',fontsize=15)#,bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+          ('$T_{Soda}$','$T_{Refrigerator}$', '$T_{Ambient}$'),loc='left',fontsize=17)#,bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
 
 plt.subplot(2,1,2)
 condition_lines =[]

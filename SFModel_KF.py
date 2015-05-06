@@ -90,7 +90,7 @@ def main():
     kfPlot[0].plot([], [], 'k-', label=r'One Standard Deviation', linewidth=10, alpha=0.1) ## Dummy plot for legend
     kfPlot[0].set_ylabel(r'Soda Temp [Celcius]', fontsize=13)
     kfPlot[0].set_ylim(0,18)
-    kfPlot[0].legend(fontsize=11)
+    kfPlot[0].legend(fontsize=13)
     kfPlot[0].set_title('State Estimation of Soda Temerature with Kalman Filter',fontsize=22)
     kfPlot[0].tick_params(labelsize=15)
      ##   Plot true and estimated fridge temp plus/minus one sigma
@@ -100,7 +100,7 @@ def main():
     kfPlot[1].plot([], [], 'k-', label=r'One Standard Deviation', linewidth=10, alpha=0.1) ## Dummy plot for legend
     kfPlot[1].set_ylabel(r'Fridge Temperature [Celcius]', fontsize=13)
     kfPlot[1].set_ylim(0,18)
-    kfPlot[1].legend(fontsize=11)
+    kfPlot[1].legend(fontsize=13)
     kfPlot[1].tick_params(labelsize=15)
 
     ##   Plot error between true and estimated soda temp
