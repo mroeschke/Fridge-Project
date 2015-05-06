@@ -15,7 +15,7 @@ import scipy.integrate as inte
 
 
 def main():
-    fs = 12    ## Font Size for plot axes
+    fs = 17    ## Font Size for plot axes
     plt.close('all')
     plt.style.use('ggplot')
 
@@ -88,27 +88,30 @@ def main():
     kfPlot[0].plot(data['t'],data['T_s'], 'g-', label='Measured')
     kfPlot[0].plot(data['t'],T_s_hat, 'r--', label='Estimated')
     kfPlot[0].plot([], [], 'k-', label=r'One Standard Deviation', linewidth=10, alpha=0.1) ## Dummy plot for legend
-    kfPlot[0].set_ylabel(r'Soda Temp [Celcius]', fontsize=fs)
+    kfPlot[0].set_ylabel(r'Soda Temp [Celcius]', fontsize=13)
     kfPlot[0].set_ylim(0,18)
-    kfPlot[0].legend(fontsize=10)
-    kfPlot[0].set_title('State Estimation of Soda and Referigerator Temeratures with Kalman Filter')
+    kfPlot[0].legend(fontsize=13)
+    kfPlot[0].set_title('State Estimation of Soda Temerature with Kalman Filter',fontsize=22)
+    kfPlot[0].tick_params(labelsize=15)
      ##   Plot true and estimated fridge temp plus/minus one sigma
     kfPlot[1].fill_between(data['t'], T_f_hat_lowerbound, T_f_hat_upperbound, alpha=0.1, color='k', label=r'One Standard Deviation')
     kfPlot[1].plot(data['t'],data['T_f'], 'g-', label='Measured')
     kfPlot[1].plot(data['t'],T_f_hat, 'r--', label='Estimated')
     kfPlot[1].plot([], [], 'k-', label=r'One Standard Deviation', linewidth=10, alpha=0.1) ## Dummy plot for legend
-    kfPlot[1].set_ylabel(r'Fridge Temperature [Celcius]', fontsize=fs)
+    kfPlot[1].set_ylabel(r'Fridge Temperature [Celcius]', fontsize=13)
     kfPlot[1].set_ylim(0,18)
-    kfPlot[1].legend(fontsize=10)
+    kfPlot[1].legend(fontsize=13)
+    kfPlot[1].tick_params(labelsize=15)
 
     ##   Plot error between true and estimated soda temp
     kfPlot[2].plot(data['t'], data['T_s']-T_s_hat, 'b-')
-    kfPlot[2].set_ylabel(r'Soda Estimation Error', fontsize=fs)
+    kfPlot[2].set_ylabel(r'Soda Estimation Error', fontsize=13)
     kfPlot[2].set_xlabel(r'Time [min]', fontsize=fs)
     kfPlot[2].set_ylim(-0.5, .5)
+    kfPlot[2].tick_params(labelsize=15)
 
-    #f.savefig('Kamlan Filter Results.pdf')
-    #f.savefig('Kamlan Filter Results')
+    f.savefig('Kamlan Filter Results.pdf')
+    f.savefig('Kamlan Filter Results')
 
     plt.show()
     
@@ -116,15 +119,17 @@ def main():
     plt.subplot(2,1,1)
     condition_lines =[]
     condition_lines.append( plt.plot(input_data[0,:],input_data[3,:]))
-    plt.title('Inputs for Kamlan Filter')
-    plt.ylabel('Ambient Temperature [Celcius]')
+    plt.title('Inputs for Kamlan Filter',fontsize=22)
+    plt.ylabel('Ambient Temperature [Celcius]',fontsize = fs)
+    plt.tick_params(labelsize=15)
     
 
     plt.subplot(2,1,2)
     condition_lines =[]
     condition_lines.append( plt.plot(input_data[0,:],input_data[4,:]))
-    plt.ylabel('Compressor State')
-    plt.xlabel('Time [Minutes]')
+    plt.ylabel('Compressor State',fontsize = fs)
+    plt.xlabel('Time [Minutes]',fontsize = fs)
+    plt.tick_params(labelsize=15)
     plt.tight_layout()
     plt.savefig('State Estimation_Typical Input States.pdf')
     plt.savefig('State Estimation_Typical Input States')
