@@ -160,7 +160,7 @@ CI_forecast[:,0] = [CI_forecast[0,0] + i for i in range(len(CI_forecast))]
 # Calculate time horizon
 dt = 1. # Timestep length (minutes)
 now = DT.datetime.now()
-N = int(((min(len(T_forecast), len(CI_forecast), 24) + 1)*60. - now.minute)/dt) # Timesteps to forecast
+N = int(36*(60/dt)) #20 hour horizon int(((min(len(T_forecast), len(CI_forecast), 24) + 1)*60. - now.minute)/dt) # Timesteps to forecast
 
 # Enumerate Time Steps and States
 min_cycle = 5. # Minumum cycle minutes
@@ -183,7 +183,7 @@ T_amb = np.interp((np.array(range(N))+now.minute)/60.+now.hour, T_forecast[:,0],
 #Cost Function
 #############################################################
 # Cost weigting factor
-lam = 50  # 0: Dollars only, 100: Carbon only
+lam = 0  # 0: Dollars only, 100: Carbon only
 
 # Rate Schedule (this is just a template until a real one is determined)
 #A6 PGE Rate "Small Time of Use" (Summer)
@@ -202,17 +202,21 @@ for i in range(N):
         dollars[i+5] = peak*(dt/60.)
     else:
         dollars[i+5] = part_peak*(dt/60.)
+
+'''
 dollar_scaler = preprocessing.MinMaxScaler(feature_range=[1,10]) #normalize dollar values as values btwn 1-10
 dollars_scaled = dollars #normalize dollar values as values btwn 1-10
 dollars_scaled[5:N+5] = dollar_scaler.fit_transform(dollars_scaled[5:N+5]) #normalize dollar values as values btwn 1-10
-
+'''
 # Carbon vector is calculated in lb CO2 per kW per timestep
 carbon = np.zeros((total_states))
 carbon[5:N+5] = np.interp((np.array(range(N))+now.minute)/60.+now.hour, CI_forecast[:,0], CI_forecast[:,1])*(dt/60.)/1000
+'''
 carbon_scaler = preprocessing.MinMaxScaler(feature_range=[1,10]) #normalize carbon values as values btwn 1-10
 carbon_scaled = carbon #normalize carbon values as values btwn 1-10
-carbon_scaled[5:N+5] = carbon_scaler.fit_transform(carbon_scaled[5:N+5]) #normalize carbon values as values btwn 1-10 
-f = lam*carbon_scaled + (100-lam)*dollars_scaled
+carbon_scaled[5:N+5] = carbon_scaler.fit_transform(carbon_scaled[5:N+5]) #normalize carbon values as values btwn 1-10
+'''
+f = lam*carbon + (100-lam)*dollars
 
 ##############################################################
 #Descretize Model
@@ -328,7 +332,7 @@ b = np.concatenate((b_compressor_highbound,b_compressor_lowbound,b_soda_schedule
 #Solve MILP
 ##############################################################
 
-boolVars = range(1,s_states+1)  # Compressor states are boolean variables
+boolVars = range(1,s_states+1)  # Compressor states are boolean variables, lpsolve is 1 indexed, not 0
 eq_const = len(A_eq)
 ineq_const = len(A)
 # lpsolve inputs one set of A, b constraint matrices and an e vector that specifies equality or inequaity for each row.
@@ -338,7 +342,9 @@ b1 = np.concatenate((b_eq, b), axis=0)[:,0].tolist()
 e = np.zeros((eq_const + ineq_const))
 e[eq_const:] = -1  # 0: equality, -1: less than or eq, 1: greater than or eq
 e = e.tolist()
-[obj,x,duals] = lp_solve_alt(f=f.tolist(),a=a1,b=b1,e=e,xbool=boolVars,scalemode=1,quick=True)
+vlb = np.empty((total_states))
+vlb[s_states:] = -np.inf # Must allow temp states to be negative
+[obj,x,duals] = lp_solve_alt(f=f.tolist(),a=a1,b=b1,e=e,vlb=vlb,xbool=boolVars,scalemode=1,quick=True)
 
 ##############################################################
 #Plot Results
@@ -369,7 +375,7 @@ axis[2].plot(t_1,T_amb,'g--', label='Ambient Temperature')
 axis[2].set_ylabel(r'Temperature [$\degree$C]')
 axis[2].set_xlabel('Minutes Ahead')
 axis[2].set_xlim(0,N)
-axis[2].set_ylim(-1,21)
+axis[2].set_ylim(-6,21)
 axis[2].plot([], [], 'y-', label=r'Temperature Schedule', linewidth=10, alpha=0.3) ## Dummy plot for legend
 axis[2].legend(fontsize=9)
 
