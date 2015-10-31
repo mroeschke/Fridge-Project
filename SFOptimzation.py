@@ -209,20 +209,20 @@ def run_opt(lam, data):
         else:
             dollars[i+5] = part_peak*(dt/60.)
 
-    '''
+    
     dollar_scaler = preprocessing.MinMaxScaler(feature_range=[1,10]) #normalize dollar values as values btwn 1-10
     dollars_scaled = dollars #normalize dollar values as values btwn 1-10
     dollars_scaled[5:N+5] = dollar_scaler.fit_transform(dollars_scaled[5:N+5]) #normalize dollar values as values btwn 1-10
-    '''
+    
     # Carbon vector is calculated in lb CO2 per kW per timestep
     carbon = np.zeros((total_states))
     carbon[5:N+5] = np.interp((np.array(range(N))+now.minute)/60.+now.hour, CI_forecast[:,0], CI_forecast[:,1])*(dt/60.)/1000
-    '''
+    
     carbon_scaler = preprocessing.MinMaxScaler(feature_range=[1,10]) #normalize carbon values as values btwn 1-10
     carbon_scaled = carbon #normalize carbon values as values btwn 1-10
     carbon_scaled[5:N+5] = carbon_scaler.fit_transform(carbon_scaled[5:N+5]) #normalize carbon values as values btwn 1-10
-    '''
-    f = lam*carbon + (100-lam)*dollars
+    
+    f = lam*carbon_scaled + (100-lam)*dollars_scaled
 
     ##############################################################
     #Descretize Model

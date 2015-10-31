@@ -88,9 +88,9 @@ def main():
     kfPlot[0].plot(data['t'],data['T_s'], 'g-', label='Measured')
     kfPlot[0].plot(data['t'],T_s_hat, 'r--', label='Estimated')
     kfPlot[0].plot([], [], 'k-', label=r'One Standard Deviation', linewidth=10, alpha=0.1) ## Dummy plot for legend
-    kfPlot[0].set_ylabel(r'Soda Temp [Celcius]', fontsize=13)
+    kfPlot[0].set_ylabel(r'Soda Temp [$\degree$C]', fontsize=15)
     kfPlot[0].set_ylim(0,18)
-    kfPlot[0].legend(fontsize=13)
+    kfPlot[0].legend(fontsize=14,loc='upper center',ncol=3)
     kfPlot[0].set_title('State Estimation of Soda Temerature with Kalman Filter',fontsize=22)
     kfPlot[0].tick_params(labelsize=15)
      ##   Plot true and estimated fridge temp plus/minus one sigma
@@ -98,14 +98,14 @@ def main():
     kfPlot[1].plot(data['t'],data['T_f'], 'g-', label='Measured')
     kfPlot[1].plot(data['t'],T_f_hat, 'r--', label='Estimated')
     kfPlot[1].plot([], [], 'k-', label=r'One Standard Deviation', linewidth=10, alpha=0.1) ## Dummy plot for legend
-    kfPlot[1].set_ylabel(r'Fridge Temperature [Celcius]', fontsize=13)
+    kfPlot[1].set_ylabel(r'Fridge Temperature [$\degree$C]', fontsize=15)
     kfPlot[1].set_ylim(0,18)
-    kfPlot[1].legend(fontsize=13)
+    kfPlot[1].legend(fontsize=14,loc='upper center',ncol=3)
     kfPlot[1].tick_params(labelsize=15)
 
     ##   Plot error between true and estimated soda temp
     kfPlot[2].plot(data['t'], data['T_s']-T_s_hat, 'b-')
-    kfPlot[2].set_ylabel(r'Soda Estimation Error', fontsize=13)
+    kfPlot[2].set_ylabel(r'Soda Estimation Error', fontsize=15)
     kfPlot[2].set_xlabel(r'Time [min]', fontsize=fs)
     kfPlot[2].set_ylim(-0.5, .5)
     kfPlot[2].tick_params(labelsize=15)

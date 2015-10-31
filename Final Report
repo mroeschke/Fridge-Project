@@ -1,0 +1,453 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Journal Article
+% LaTeX Template
+% Version 1.3 (9/9/13)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Frits Wenneker (http://www.howtotex.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[twoside]{article}
+
+\usepackage[sc]{mathpazo} % Use the Palatino font
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+\linespread{1.05} % Line spacing - Palatino needs more space between lines
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+
+%\usepackage[hmarginratio=1:1,top=32mm,columnsep=20pt]{geometry} % Document margins
+\usepackage[top=1in, bottom=1in, left=0.5in, right=0.5in, columnsep=20pt]{geometry}
+\usepackage{multicol} % Used for the two-column layout of the document
+\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption} % Custom captions under/above floats in tables or figures
+\usepackage{booktabs} % Horizontal rules in tables
+\usepackage{float} % Required for tables and figures in the multi-column environment - they need to be placed in specific locations with the [H] (e.g. \begin{table}[H])
+\usepackage{hyperref} % For hyperlinks in the PDF
+
+\usepackage{lettrine} % The lettrine is the first enlarged letter at the beginning of the text
+\usepackage{paralist} % Used for the compactitem environment which makes bullet points with less space between them
+
+\usepackage{abstract} % Allows abstract customization
+\renewcommand{\abstractnamefont}{\normalfont\bfseries} % Set the "Abstract" text to bold
+\renewcommand{\abstracttextfont}{\normalfont\small\itshape} % Set the abstract itself to small italic text
+
+\usepackage{titlesec} % Allows customization of titles
+\renewcommand\thesection{\Roman{section}} % Roman numerals for the sections
+\renewcommand\thesubsection{\arabic{subsection}} % Numbers for subsections
+\titleformat{\section}[block]{\large\scshape\centering}{\thesection.}{1em}{} % Change the look of the section titles
+\titleformat{\subsection}[block]{\em}{\thesubsection.}{1em}{} % Change the look of the subsection titles
+
+\usepackage{fancyhdr} % Headers and footers
+\pagestyle{fancy} % All pages have headers and footers
+\fancyhead{} % Blank out the default header
+\fancyfoot{} % Blank out the default footer
+\fancyhead[C]{Energy, Controls, \& Applications Lab $\bullet$ Energy Systems and Control: May 2015 $\bullet$ DeWitt \& Roeschke} % Custom header text
+\fancyfoot[RO,LE]{\thepage} % Custom footer text
+
+\usepackage{graphicx} % For figure graphics
+\usepackage{wrapfig}
+\usepackage{gensymb}
+\usepackage{amsmath}
+\usepackage{capt-of}
+
+\newenvironment{Figure}
+  {\par\medskip\noindent\minipage{\linewidth}}
+  {\endminipage\par\medskip}
+
+\setlength{\parskip}{1pt}
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\title{\vspace{-15mm}\fontsize{24pt}{10pt}\selectfont\textbf{Optimal Refrigeration Control for Soda Vending Machines}} % Article title
+
+\author{
+\large
+\textsc{Zoltan DeWitt and Matthew Roeschke}\\[2mm] % Your name
+\normalsize University of California, Berkeley \\ % Your institution
+\vspace{-5mm}
+}
+\date{}
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\maketitle % Insert title
+
+\thispagestyle{fancy} % All pages have headers and footers
+
+%----------------------------------------------------------------------------------------
+%	ABSTRACT
+%----------------------------------------------------------------------------------------
+
+\begin{abstract}
+
+\noindent
+The prevalent soda vending machine industry in the US could yield reductions in energy consumption by addressing operational use. A study by the National Renewable Energy Laboratory estimates that each of the 4.6 million vending machines in the US consumes between 7 and 13kWh per day.$^{[1]}$ Currently, soda vending machines keep their products at a consistent temperature regardless of the time of day. Although no formal soda vending machine usage patterns have been observed, we hypothesize that usage patterns primarily follow time of day with high utilization during midday and afternoon and low utilization during the night and morning. However, soda is generally non-perishable and does not need to be refrigerated during periods of low to no soda demand. In this report, we construct a thermodynamic, state space refrigerator model and integrate a hypothetical soda demand schedule in order to optimize the operation of a soda vending machine that minimizes energy and carbon impact while maximizing the delivery of the appropriately chilled soda.
+
+\end{abstract}
+
+%----------------------------------------------------------------------------------------
+%	ARTICLE CONTENTS
+%----------------------------------------------------------------------------------------
+
+\begin{multicols}{2} % Two-column layout throughout the main article text
+
+\begin{figure*}[ht!]
+\begin{center}
+\includegraphics[width=6in]{refrigerator-ee-stds.png}
+\end{center}
+\caption{Refrigerator Energy Use Over Time \cite{NREL}}
+\label{nrelgraph}
+\end{figure*}
+
+\section{Introduction}
+
+\lettrine[nindent=0em,lines=3]{R}efrigeration, and space conditioning in general, occupies a reasonably large portion of the total energy usage in the United States. The U.S. Department of Energy estimates that refrigeration accounts for approximately 7\% of total commercial building energy usage. The bygone era of cheap and plentiful electricity provided little incentive to push for more efficient refrigerators in both the home and commercial installations. Gradually, the energy consumption per refrigerator unit increased, outpacing the rate at which the physical size of each refrigerator unit was growing (Figure \ref{nrelgraph}). Regulations at both the state and federal level were enacted which finally required steady reductions in the energy usage of these appliances; refrigerator energy consumption began to decline dramatically afterwards. Clearly, without any incentive to increase efficiency, little technological improvements were made in the refrigerator sector.
+\par
+The commercial, soda vending machine sector faces an economic obstacle that hinders the incentives for increased energy efficiency. Most vending machines are owned by a vending or beverage company which contracts with building managers to have a machine placed on their premises. This arrangement sets an economic disconnect between the owner of the machine (the vending company) and the payer of the electrical bill (the building manager). The vending company is not incentivized to improve the energy efficiency of their equipment since they do not pay for the energy consumption. Also, no Energy Star rating is currently established for soda vending machines, although there is some movement to establish one.\cite{NREL}
+\par
+Refrigerated devices have gained significant interest for dynamic demand management in the power utility sector as these devices are viewed as a flexible, energy storage resource. Refrigerated systems can help stabilize power demand fluctuations in the grid by advancing or retarding their cooling cycles while still staying within a desired temperature band. Large thermal ballasts inside the refrigerated areas help to keep the temperature more stable during periods when it may be desirable to turn off the compressor for grid-related reasons.\cite{callaway2009}
+\par
+While these special "ancillary" services for reliability management are of interest for all thermostatically controlled loads, soda vending machines are of unique interest because soda has a much wider, acceptable temperature range. While most commercial refrigeration units must keep perishables below 40\degree F, soda has no storage temperature restriction except to serve the product acceptably cold the moment it is sold. Currently, vending machines operate to keep soda cold at all times in case someone wants to purchase one. The energy consumption of vending machines can be significantly reduced by regulating the compressor based on a thermal model of the vending machine and soda demand throughout the day.
+
+
+%------------------------------------------------
+\section{Technical Description}
+
+\subsection{Testbed and Data Acquisition}
+
+\par
+The testbed for this project consists of a mini-fridge, an Arduino microcontroller, four temperature sensors, and one current sensor connected to the fridge compressor (Figure \ref{equipment}). The temperature sensors measure the main refrigerator compartment temperature, soda bottle temperature, water bottle temperature, and ambient room temperature. The microcontroller also controls the actuation of the refrigerator compressor, receiving commands to maintain a setpoint temperature within the bounds of a specified deadband width. In order to better simulate a well-mixed environment such as in a commercial vending machine, a fan was added inside the fridge cavity.
+\par 
+The microcontroller performs two main functions: temperature data logging and deadband control. The temperature readings from each sensor are logged at one-minute intervals and stored on a memory card for later analysis. In order to adapt this model to a commercial machine, a separate temperature data set would need to be acquired from a test unit and analyzed. However, this setup can serve as a proof of concept for these methods. Only in this test machine is there a need for more than one sensor; a commercial unit would only monitor the fridge temperature.
+\par 
+Deadband control is also performed by the microcontroller, keeping the fridge temperature within a certain bounds. The target setpoint is programmable on an hourly basis for a 24-hour period. This setpoint schedule would eventually be used in a commercial unit,  possibly receiving daily values from a remote server. During our test phase, this schedule was adjusted several times to collect a range of data for more accurate results.
+
+\begin{figure*}[ht!]
+\includegraphics[width=0.5\textwidth]{logger.JPG}
+\includegraphics[width=0.5\textwidth]{insideFridge.JPG}
+\caption{Data Acquisition Equipment}
+\label{equipment}
+\end{figure*}
+
+\subsection{Nomenclature}
+
+\begin{align*}
+C_s &= \text{Thermal Capacitance of Soda}\\
+C_f &= \text{Thermal Capacitance of Refrigerator Air}\\
+R_s &= \text{Thermal Resistance of Soda Container}\\
+R_f &= \text{Thermal Resistance of Refrigerator Wall}\\
+Q_c &= \text{Compressor Heat Power}\\
+T_s &= \text{Temperature of Soda}\\
+T_f &= \text{Temperature of Refrigerator Air}\\
+T_o &= \text{Temperature of Ambient Air}\\
+s &= \text{Compressor State (1 = On, 0 = Off)}\\
+e &= \text{Rate Schedule for Electric Power}\\
+c &= \text{Carbon Intensity of Electric Power}\\
+\lambda &= \text{Cost Function Weighting Factor}\\
+P &= \text{Power Consumption of Compressor}
+\end{align*}
+
+
+\subsection{Modeling}
+\par
+The modeling objective is to understand how the soda temperature behaves given the temperature of the refrigerator which is influenced by ambient temperature and refrigerator compressor. The temperature dynamics of the soda and refrigerator is governed by the heat transfer between the soda, refrigerator air, ambient air outside the refrigerator, and heat removed by the compressor. Mathematically, the refrigerator and soda temperature evolve according to the following equations:
+
+\begin{align}
+&C_s\frac{dT_s}{dt} = \frac{1}{R_s}(T_s(t)-T_f(t)) \\
+&C_f\frac{dT_f}{dt} = \frac{1}{R_f}(T_o(t)-T_f(t)) \\
+&\phantom{C_f\frac{dT_f}{dt}}+ \frac{1}{R_s}(T_s(t)-T_f(t)) + Q_{c}s(t) \notag
+\end{align}
+
+\par
+The states, \(T_s\) and \(T_f\), are to be estimated given the uncontrollable input, \(T_o\), and controllable input, \(s\). The unknown parameters of this model are \(C_s,C_f,R_s,R_f,Q_c\) and assumed to be independent. 
+
+\subsection{Parameter Estimation and Results}
+\par
+The target states evolve according to the following equations:
+
+\begin{align}
+&\dot{x}_1 = \frac{1}{R_sC_s}x_1 - \frac{1}{R_sC_s}x_2 \\
+&\dot{x}_2 = \frac{1}{R_fC_f}u_1 - \frac{1}{R_fC_f}x_2 \\
+&\phantom{\dot{x}_2}+ \frac{1}{R_sC_f}x_1 - \frac{1}{R_sC_f}x_2 + \frac{Q_c}{C_f}u_2 \notag
+\end{align}
+
+Where \(x_1\) and \(x_2\) are the soda and referigerator states respectively and \(u_1\) and \(u_2\) are the ambient temperature and compressor state inputs respectively. 
+
+With the following parameter assignments, equations 3 and 4 can be arranged in the following matrix form in preparation for identification:
+
+\begin{align*}
+p_0 &= \frac{1}{R_sC_s} & 
+p_1 &= \frac{1}{R_sC_f} & 
+p_2 &= \frac{1}{R_fC_f} & 
+p_3 &= \frac{Q_c}{C_f}
+\end{align*}
+
+\begin{equation}
+\left[ \begin{array}{c} \dot{x}_1 \\ \dot{x}_2 \end{array} \right] = \begin{bmatrix} p_0 & 0 & 0 \\ p_1 & p_2 & p_3 \end{bmatrix} \left[ \begin{array}{c} x_1 - x_2 \\ u_1 - x_2 \\u_2 \end{array} \right]
+\end{equation}
+
+\centerline{or}
+
+\begin{equation}
+z(t) = \theta^T\phi
+\end{equation}
+
+From equation 6, the normalized recursive gradient update law is applied to identify parameters.
+
+\begin{align}
+&\dot{\hat{\theta}}(t) = \Gamma\circ\phi(t)\epsilon^T(t) \\
+&\hat{\theta}(0) = \hat{\theta}_0 \notag \\
+&\epsilon(t) = \frac{z(t) - \hat{\theta}^T\phi(t)}{m^2(t)} \\
+&m^2(t) = 1 + \phi^T(t)\phi(t) 
+\end{align}
+
+Where the update gain, \(\Gamma\), is a non-negative matrix of the same size as \(\theta\), \(\epsilon(t)\) is the normalized prediction error, and \(m^2(t)\) is the normalization signal. The Hadamard product is denoted by \(\circ\), which is an element-wise multiplication of two matrices of the same size. The update gain matrix is adjusted to have appropriate gain for each corresponding parameter estimate in the \(\hat{\theta}\) matrix. 
+
+Soda temperature, refrigerator temperature, ambient temperature, and current (which was used to determine compressor state) was measured from the test bed at one minute intervals for one week. Two different control schemes were tested during the week as seen in the one day examples in Figure \ref{Measured Inputs}. The first control scheme was a standard, refrigerator temperature control scheme based on a fixed set point temperature and dead-band. The second control scheme involved deactivating the compressor for an extended period of time then implementing rapid cooling to simulate a potential, overnight vending machine control strategy.
+
+The recursive gradient update law was implemented in Python, and the parameter values converged quickly to steady state values as seen in Table \ref{Parameter Table}
+
+\begin{figure*}%--- The t is for 'top' or b for 'bottom'(gotcha thanks!)
+\includegraphics[width=0.5\textwidth]{Parameter_Estimation_Forced_Control_States}
+\includegraphics[width=0.5\textwidth]{Parameter_Estimation_Typical_Control_States.png}
+\caption{Compressor and Ambient Temperature Inputs (Left: Custom Control, Right: Normal Control)}
+\label{Measured Inputs}
+\end{figure*}
+
+\begin{figure*}
+\centering
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\vspace{0pt}
+\includegraphics[width=\textwidth]{Parameter_Estimates.png}
+\caption{Parameter Estimation with Gradient Decent}
+\label{Parameter Estimation Graph}
+\end{minipage}\hfill
+\begin{minipage}[t]{.5\textwidth}
+\centering
+\vspace{1pt}
+\captionof{table}{Parameter Estimates}
+\begin{tabular}{c|c}
+\hline
+\(p_0\) & \(-9.8\times 10^{-3}\) \\
+\(p_1\) & \(5.4\times 10^{-2}\) \\
+\(p_2\) & \(2.1\times 10^{-2}\) \\
+\(p_3\) & \(-1.6\times 10^{-1}\) \\
+\hline
+\label{Parameter Table}
+\end{tabular}
+\end{minipage}
+\end{figure*}
+
+
+\subsection{State Estimation and Results}
+
+\par
+Although our test bed is capable of measuring soda temperature, vending machines do not typically measure this state. In order to emulate this limitation, the soda temperature is estimated using our thermodynamic state space system with the identified parameters, process noise \(w(t)\), and sensor noise \(n(t)\):
+
+\begin{multline}
+\left[ \begin{array}{c} \dot{x}_1 \\ \dot{x}_2 \end{array} \right] = \begin{bmatrix} p_0 & -p_0 \\ p_1 & -p_1 - p_2 \end{bmatrix} \left[ \begin{array}{c} x_1 \\ x_2 \end{array} \right] \\ + \begin{bmatrix} 0 & 0 \\ p_2 & p_3 \end{bmatrix} \left[ \begin{array}{c} u_1 \\ u_2 \end{array} \right] +w
+\end{multline}
+
+\begin{equation}
+x_2 = \begin{bmatrix} 0 & 1 \end{bmatrix} \left[ \begin{array}{c} x_1 \\ x_2 \end{array} \right] + n
+\end{equation}
+
+\centerline{or}
+
+\begin{align}
+&\dot{x}(t) = Ax(t) + Bu(t) + w(t) \\
+&y_m(t) = Cx(t) + n(t)
+\end{align}
+
+The noise terms are assumed to be Gaussian around a zero mean with covariances W and N for processor and sensor noise respectively. N is additionally assumed to be positive definite.
+
+The states of our linear, thermodynamic system are estimated using the Kalman filter algorithm:
+\begin{align}
+&\dot{\hat{x}} = A\hat{x}(t) + Bu(t) + L(t)(y_m - C\hat{x}) \\
+& \hat{x}(0) =\hat{x}_0 \notag \\
+&L(t) = \Sigma(t)C(t)N^{-1}, \forall t>0 \\
+&\dot{\Sigma}(t) = \Sigma(t)A^T + A\Sigma(t) + W \\
+&\phantom{\dot{\Sigma}(t)}-\Sigma(t)C^TN^{-1}C\Sigma(t)\\
+&\Sigma(0) = \Sigma_0 \notag
+\end{align}
+
+
+Equation 15 is the observer gain of the system, and equation 16 is the Riccati differential equation that solves for \(\Sigma(t)\). 
+
+The Kalman Filter algorithm was implemented in Python, and the soda temperature state was estimated over refrigerator temperature, ambient temperature, and current measurements taken over a span of 4 days. These measurements are different than the data used for parameter identification. Soda temperature was also measured but was not used as feedback in the Kalman Filter algorithm. The soda temperature measurements are used to evaluate the estimation error as seen in Figure \ref{Kalman Results}.     
+
+\begin{figure*}%--- The t is for 'top' or b for 'bottom'(gotcha thanks!)
+\includegraphics[width=0.5\textwidth]{Kamlan_Filter_Results.png}
+\includegraphics[width=0.5\textwidth]{State_Estimation_Typical_Input_States.png}
+\caption{Left: State Estimation Results, Right: Input States)}
+\label{Kalman Results}
+\end{figure*}
+
+\subsection{Model Discretization}
+In preparation for the optimization program, equation 12, which is continuous in the time domain, is discretized using the exponentiation formulation. \cite{decarlo1989}
+
+$$
+e^{\left(
+\begin{bmatrix}
+A & B \\
+0 & 0
+\end{bmatrix}
+\Delta t \right)} = 
+\begin{bmatrix}
+A_{d} & B_{d} \\ 
+0 & I
+\end{bmatrix}
+$$
+
+Where \(\Delta t\) is 1 minute, the desired timestep of the discrete-time equations, and \(A_{d}\) and \(B_{d}\) are the discretized matrices of \(A\) and \(B\) respectively. Using the parameters identified in Table \ref{Parameter Table}, equation 12 is discretized as follows:
+
+\begin{align}
+&T_{s}(k+1) = A_{d,11}T_{s}(k) + A_{d,12}T_{f}(k) \\
+&T_{f}(k+1) = A_{d,21}T_{s}(k) + A_{d,22}T_{f}(k) \\
+&\phantom{T_{f}(k+1)}+ B_{d,21}T_{o}(k) + B_{d,22}s(k) \notag \\
+&A_{disc} = 
+\begin{bmatrix}
+0.990 & 0.010 \\ 
+0.005 & 0.993
+\end{bmatrix} \\
+&B_{disc} = 
+\begin{bmatrix}
+1.00 \times 10^{-5} & -7.76 \times 10^{-4} \\ 
+2.06 \times 10^{-3} & -1.59 \times 10^{-1}
+\end{bmatrix}
+\end{align}
+
+
+\subsection{Optimization Problem}
+
+
+\par
+Assuming soda beverage demand is particular to the time of day, vending machines can leverage this consumer behavior to optimize refrigeration of their soda beverages. Namely, vending machines can chill their contents at certain times of the day in order to minimize the cost of electricity and emissions of carbon dioxide (CO$_2$) while dispensing the soda beverage at the appropriate temperature. This refrigeration operation optimization can be mathematically constructed with the following formulation:
+
+\begin{align}
+& \min_{s(k),T_{f}(k),T_{s}(k)} \sum_{k=0}^{N-1} (\lambda c(k) + (1-\lambda)e(k))Ps(k) \\
+& \text{Subject to:} \notag \\
+& T_{s}(k+1) = A_{d,11}T_{s}(k) + A_{d,12}T_{f}(k) \\
+&T_{f}(k+1) = A_{d,21}T_{s}(k) + A_{d,22}T_{f}(k)\\ 
+&\phantom{T_{f}(k+1)}+ B_{d,21}T_{o}(k) + B_{d,22}s(k)\notag \\
+&T_{s,min,on} \leq T_{s}(i) \leq T_{s,max,on}\\
+&T_{s,min,off} \leq T_{s}(j) \leq T_{s,max,off}\\
+&T_{f}(0) = T_{f,o} \\
+&T_{s}(0) = T_{s,o} \\
+&0 \leq s(k-5) + s(k-4) + s(k-3) \label{cycle} \\
+&\phantom{0} + s(k-2) - 4s(k-1) + 5s(k) \leq 5 \notag \\
+&s(k) = [0,1] \\ 
+&\forall k=0,...,N-1 \notag \\
+& i \in k\mathrel{\widehat{=}}10am,...,4pm \notag\\
+& j \in k\mathrel{\widehat{=}}4pm,...,10am \notag
+\end{align}
+
+\begin{figure*}[ht!]
+\includegraphics[width=0.5\textwidth]{lam20b.pdf}
+\includegraphics[width=0.5\textwidth]{lam80b.pdf}
+\caption{Optimal Control Results: Left $\lambda = 0.2$, Right $\lambda = 0.8$}
+\label{results}
+\end{figure*}
+
+\par
+Equation 22 describes the minimization of the normalized sum of electricity cost and associated carbon emission over the time period, \(N-1\). The relative importance of electricity cost and carbon emissions can be adjusted with $\lambda$. A $\lambda$ value of 0 indicates full electricity cost influence, and a $\lambda$ value of 1 indicates full carbon emission influence. The refrigerator compressor is assumed to draw 0.1kW while operating.    
+
+\par
+The optimization is constrained by the discretized model of soda and refrigerator dynamics (23 \& 24) with initial conditions 27 and 28. The inequalities 25 and 26 implement a simple scheme to integrate consumer behavior into refrigeration operation. If the time step corresponds to the time period between 10am and 4pm, soda temperature is constrained to a dispensable soda temperature range, 0$\degree$C - 5$\degree$C (25). Outside this time period, soda temperature can float in a wider temperature range, 0$\degree$C - 15$\degree$C (26). Additionally, to avoid rapid on-and-off cycling of the compressor, inequality 29 ensures that the compressor state does not change more than once in any 5 minute period. The mathematical formulation of this constraint is accomplished through creating a separate variable, $int$, which has the following property:
+\begin{align}
+int_k = 
+\begin{cases}
+    5,    & \text{if }s_{k-1} = 0 \text{ and } s_k = 1\\
+    -5,   & \text{if }s_{k-1} = 1 \text{ and } s_k = 0\\
+    0,    & \text{else}
+\end{cases}
+\end{align}
+We can accomplish this with the formula:
+\begin{align}
+int_k = -5s_{k-1}+5s_k \label{int}
+\end{align}
+This variable is only non-zero during the timestep when the compressor turns on or off. This variable in conjunction with the last 5 states of the compressor creates two inequality constraints:
+\begin{align}
+0 \leq int_k + \sum\limits_{i = k-1}^{k-5} s_i \leq 5 \label{intSum}
+\end{align}
+The key to this method is that the constraints will fail only at the timestep where the compressor decides to change state, if all the previous timesteps are not the same value. Since these constraints must be valid for all timesteps, then this will limit our compressor cycles to a minimum of 5 minutes. Equations \ref{int} and \ref{intSum} can be substituted to form inequality \ref{cycle}. This method can easily be adapted to work for other minimum cycle lengths.
+
+This Mixed Integer Linear Program (MILP) can be succinctly summarrized as follows:
+\begin{align}
+&\min f^Tx\\
+&\text{Subject to:} \notag\\
+&Ax \leq b\\
+&A_{eq}x = b_{eq}\\
+&\forall s \in x = \{0, 1\}
+\end{align}
+
+Where \(f\) is a vector that contains the carbon and electricity costs for all time steps, \(x\) is a vector that contains the decision states, \(T_{s}(k),T_{f}(k),s(k)\), and \(A,B,A_{eq},B_{eq}\) are matrices that describe the inequality and equality constraints. The MILP is solved using the open source lpsolve package with Python.
+
+The electricity rate schedule is based on Pacific Gas and Electric's (PGE) A6: "Small General Time of Use" summer rate schedule. Electricity rates are converted to a per kW basis in the optimization problem by adjusting the values by the 1 minute sampling rate of the test bed.  
+
+\begin{center}
+\begin{tabular}{c|c|c}
+\hline
+Peak & \(\$0.61173/\)kWh & 12:00pm-6:00pm\\ 
+\hline
+Part Peak & \(\$0.28551/\)kWh & 8:30am-12:00pm \\ & & 6:00pm-9:30pm\\
+\hline
+Off Peak & \(\$0.15804/\)kWh & 9:30pm-8:30am\\
+\hline
+\end{tabular}
+\end{center}
+
+A carbon emissions forecast is queried from the WattTime Impact API for the California ISO region, and an ambient temperature forecast is queried by the Weather Underground API. The MILP is simulated 36 hours into the future. If the carbon emission forecast is not available for the entire time horizon, the last value is sustained until the end of the program.
+
+%------------------------------------------------------------
+
+\section{Results}
+Figure \ref{results} demonstrates optimal refrigeration control with a 20\% carbon emission, 80\% electricity cost influence and vice versa. When $\lambda=0.2$ (20\% carbon emission influence), the compressor operates for a longer duration in the early morning to chill the soda in order to avoid compressor usage during peak hours. The total simulated energy cost and CO$_2$ emissions for this optimization are \(\$0.06\) and \(0.28\) lbs respectively. When $\lambda = 0.8$ (80\% carbon emission influence). The compressor turns on as needed while maintaining the soda temperature closer to its maximum allowed value. The total simulated energy cost and CO$_2$ emissions for this optimization are \(\$0.07\) and \(0.27\) lbs respectively. Figure \ref{cost} illustrates the total, simulated range of carbon emissions and electricity costs for the range of weighting schemes.
+\par
+In California, the carbon intensity of electricity is fairly constant around 0.9 lb CO$_2$/kWh, providing little variance in carbon-based compressor optimization. In other ISO operating regions, carbon intensities may have more variance and provide more unique results for carbon-based compressor optimization.
+
+\begin{Figure}
+\includegraphics[width=\textwidth]{lambdaGraph.pdf}
+\captionof{figure}{Total Range of Carbon Emissions and Electricity Costs}
+\label{cost}
+\end{Figure}
+
+%------------------------------------------------------------
+
+\section{Summary}
+
+
+The current operation of soda vending machines can realize significant reductions in energy costs and CO$_{2}$ emissions by integrating information about when consumers access these machines. Current vending machine operation continually and unnecessarily chills non-perishable sodas during periods of low to no demand, creating an opportunity for energy and cost savings. A thermodynamic, state space model was created by gathering data from a refrigerator, a proxy to a vending machine, in order to understand the temperature dynamics of the sodas when the refrigerator compressor is running or is idling. Using a soda demand schedule of 6 hours per day, our models show up to a 68\% reduction in electricity costs and up to 50\% reduction in carbon footprint as compared to the reference models. These values represent a significant increase in efficiency without any additional thermal or mechanical changes. Scaling these gains up to a typical commercial unit that draws on average 7kWh/day would see savings of about \$650 and 1100 pounds of CO$_2$ per year for a single machine. If an Energy Star rating system was created for commercial vending machines similar to that which applies to consumer appliances, legislative pressure could realize large gains in efficiency for these units. Although this application is only a small sector of overall demand, the same optimizations could be applied to a wider range of appliances that would make them more responsive to both demand of service and electricity costs.
+
+%------------------------------------------------------------
+\section{Acknowledgment}
+
+We would like to thank Ph.D. student Eric Burger for his initial testbed setup and data processing code, Anna Schneider from WattTime for API integration into our project, and Professor Scott Moura for his time and lab resources. 
+%----------------------------------------------------------------------------------------
+%	REFERENCE LIST
+%----------------------------------------------------------------------------------------
+
+
+\bibliographystyle{amsplain}
+\bibliography{proposalbib}
+
+
+%----------------------------------------------------------------------------------------
+
+\end{multicols}
+
+\end{document}
