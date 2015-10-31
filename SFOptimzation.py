@@ -2,7 +2,7 @@
 """
 Created on Mon Apr 20 14:42:29 2015
 
-@author: Matt Roeschke
+@authors: Zoltan DeWitt, Matt Roeschke
 """
 import requests as req
 import datetime as DT
