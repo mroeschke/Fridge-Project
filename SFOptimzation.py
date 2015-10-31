@@ -154,8 +154,8 @@ def initialize_model(hours=24):
     CI_forecast = getWTForecast()
 
     # Remove rollover at midnight
-    T_forecast[:,0] = [T_forecast[0,0] + i for i in range(len(T_forecast))]
-    CI_forecast[:,0] = [CI_forecast[0,0] + i for i in range(len(CI_forecast))]
+    T_forecast[:,0] = [T_forecast[0,0] + i for i in range(len(T_forecast[:,0]))]
+    CI_forecast[:,0] = [CI_forecast[0,0] + i for i in range(len(CI_forecast[:,0]))]
 
     # Calculate time horizon
     dt = 1. # Timestep length (minutes)
@@ -316,7 +316,7 @@ def run_opt(lam, data):
     T_high_on = 5
     T_low_on = 0
 
-    T_high_off = 15
+    T_high_off = 5
     T_low_off = 0
 
     b_soda_schedule_highbound = np.zeros((N,1))
@@ -343,6 +343,7 @@ def run_opt(lam, data):
     ineq_const = len(A)
     # lpsolve inputs one set of A, b constraint matrices and an e vector that specifies equality or inequaity for each row.
     # The current version does not seem to accept numpy arrays properly, so they are transformed to lists.
+    # Data fields are cast to 16-bit floats to mitigate over-precision errors
     a1 = np.concatenate((A_eq, A), axis=0).astype(np.float16).tolist()
     b1 = np.concatenate((b_eq, b), axis=0)[:,0].astype(np.float16).tolist()
     e = np.zeros((eq_const + ineq_const))
@@ -364,7 +365,7 @@ def run_opt(lam, data):
     plt.style.use('ggplot')
     fs = 12
     fig, (axis) = plt.subplots(3,1, sharex=True)
-    fig.set_size_inches(6,6)
+    fig.set_size_inches(6,5)
     t_1 = range(N)
     hour_ticks = np.empty((0,2))
     for i in range (N):
@@ -383,7 +384,7 @@ def run_opt(lam, data):
     twin.plot(t_1,carbon[5:N+5]*60/dt,'r-')
     twin.set_ylabel(r'lb CO$_2$/kWh', color='r', fontsize=fs)
     axis[2].set_xticks(hour_ticks[:,0])
-    axis[2].set_xticklabels(['%2i:00' % int(hour) for hour in hour_ticks[:,1]])
+    axis[2].set_xticklabels(['%02i:00' % int(hour) for hour in hour_ticks[:,1]])
 
     axis[0].fill_between(t_1[:N], b_soda_schedule_highbound[:N,0], b_soda_schedule_lowbound[:N,0], alpha=0.3, color='y', label=r'Temp Bounds')
     axis[0].plot(t_1[:N],Ts_opt[:N],'r-', label=r'$T_s$')
@@ -402,7 +403,9 @@ def run_opt(lam, data):
 
     opt_dollars = fridge_watts*np.vdot(x, dollars)
     opt_carbon = fridge_watts*np.vdot(x, carbon)
+    opt_kwh = fridge_watts*(dt/60.)*sum(x[:s_states])
     print('Optimal dollar cost: $%f' % opt_dollars)
     print('Optimal carbon cost: %f lb CO2' % opt_carbon)
+    print('Total kWh: %f' % opt_kwh)
 
     return fig
